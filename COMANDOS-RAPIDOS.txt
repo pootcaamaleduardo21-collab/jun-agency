@@ -1,0 +1,207 @@
+================================================================================
+⚡ COMANDOS RÁPIDOS PARA VISUAL STUDIO CODE
+================================================================================
+
+COPIA Y PEGA cada comando UNO POR UNO en la terminal de VS Code
+(Atajo: Control + ~ en Mac, o Ctrl + ` en Windows)
+
+================================================================================
+🔧 PASO 1: CONFIGURAR GIT (PRIMERA VEZ SOLO)
+================================================================================
+
+Comando 1:
+git config --global user.name "Tu Nombre"
+
+Comando 2:
+git config --global user.email "tu@email.com"
+
+Reemplaza:
+- Tu Nombre = Tu nombre completo (ej: "Juan Pérez")
+- tu@email.com = Tu email (ej: "juan@gmail.com")
+
+================================================================================
+📁 PASO 2: INICIAR REPOSITORIO GIT
+================================================================================
+
+Comando 1:
+git init
+
+Comando 2:
+git add .
+
+Comando 3:
+git commit -m "Initial commit: JUN Landing Page Production Ready"
+
+(Espera a que termine - mostrará archivos creados)
+
+================================================================================
+🔗 PASO 3: CONECTAR A GITHUB
+================================================================================
+
+⚠️ PRIMERO: Crea repositorio en GitHub
+   https://github.com/new
+
+   Nombre: jun-agency
+   Click "Create repository"
+
+Comando 1:
+git remote add origin https://github.com/TU_USUARIO/jun-agency.git
+
+Reemplaza:
+- TU_USUARIO = Tu usuario de GitHub (ej: "juan123")
+
+Comando 2:
+git branch -M main
+
+Comando 3:
+git push -u origin main
+
+(Espera ~30 segundos a que suba todo)
+
+================================================================================
+✅ VERIFICAR EN GITHUB
+================================================================================
+
+Abre en navegador:
+https://github.com/TU_USUARIO/jun-agency
+
+Deberías ver todos tus archivos allí ✅
+
+================================================================================
+🚀 PASO 4: DESPLEGAR EN VERCEL
+================================================================================
+
+1. Ve a: https://vercel.com/new
+2. Click "Import Project"
+3. Click "Continue with GitHub"
+4. Autoriza Vercel
+5. Busca: jun-agency
+6. Click "Import"
+7. Click "Deploy"
+
+(Espera 2-3 minutos)
+
+================================================================================
+🔑 PASO 5: AGREGAR VARIABLES EN VERCEL
+================================================================================
+
+1. En Vercel, click "Settings"
+2. Click "Environment Variables"
+3. Agrega 3 variables (copy-paste):
+
+Variable 1:
+NEXT_PUBLIC_DOMAIN = https://jun.com.mx
+
+Variable 2:
+NEXT_PUBLIC_WHATSAPP = 529851089671
+
+Variable 3:
+NEXT_PUBLIC_EMAIL = informes@jun.com.mx
+
+4. Click "Save"
+5. En Deployments, haz "Redeploy"
+
+================================================================================
+🎉 ¡LISTO!
+================================================================================
+
+Tu sitio está en: https://jun-agency.vercel.app ✅
+
+================================================================================
+🔄 DESPUÉS (CÓMO ACTUALIZAR TU SITIO)
+================================================================================
+
+Cada vez que hagas cambios:
+
+Comando 1:
+git add .
+
+Comando 2:
+git commit -m "Describe tu cambio aquí"
+
+Comando 3:
+git push origin main
+
+(Vercel automáticamente despliega en ~1-2 minutos)
+
+================================================================================
+✨ OTROS COMANDOS ÚTILES
+================================================================================
+
+Iniciar servidor local:
+npm run dev
+
+Luego abre: http://localhost:3000
+
+Detener servidor:
+Control + C
+
+Ver estado Git:
+git status
+
+Ver commits:
+git log --oneline
+
+================================================================================
+❌ SI ALGO FALLA
+================================================================================
+
+Error: "fatal: not a git repository"
+Solución: git init
+
+Error: "Permission denied"
+Solución: Agrega SSH key a GitHub
+https://github.com/settings/keys
+
+Error: "Port 3000 in use"
+Solución: lsof -i :3000 | grep -v COMMAND | awk '{print $2}' | xargs kill -9
+
+Build falla:
+Solución:
+rm -rf .next
+npm run build
+
+================================================================================
+🎯 CHEAT SHEET (TODO EN UNO)
+================================================================================
+
+SETUP COMPLETO (COPIA Y PEGA EN ORDEN):
+
+# 1. Configurar Git
+git config --global user.name "Tu Nombre"
+git config --global user.email "tu@email.com"
+
+# 2. Inicializar repo
+git init
+git add .
+git commit -m "Initial commit: JUN Landing Page Production Ready"
+
+# 3. Conectar GitHub (reemplaza TU_USUARIO)
+git remote add origin https://github.com/TU_USUARIO/jun-agency.git
+git branch -M main
+git push -u origin main
+
+LUEGO:
+- Crea repo en GitHub: https://github.com/new
+- Conecta Vercel: https://vercel.com/new
+- Agrega variables en Vercel Settings
+
+RESULTADO: ¡Tu sitio está en vivo! 🚀
+
+================================================================================
+💡 TIPS
+================================================================================
+
+✓ Copia UN comando a la vez
+✓ Espera a que termine antes de ejecutar el siguiente
+✓ Si dice error, lee el mensaje (generalmente dice la solución)
+✓ Reemplaza TU_USUARIO con tu usuario de GitHub (sin las comillas)
+✓ Los comandos con # son comentarios (no los copies)
+
+================================================================================
+TIEMPO TOTAL: 5 minutos
+COMPLICACIONES: CERO
+DOCUMENTACIÓN: Ve a START-HERE.md si necesitas más detalles
+
+================================================================================
+¡A por ello! 🚀

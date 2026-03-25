@@ -1,0 +1,64 @@
+{
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "regions": ["iad1"],
+  "env": [
+    {
+      "key": "NEXT_PUBLIC_DOMAIN",
+      "description": "Public domain for the website",
+      "value": "@NEXT_PUBLIC_DOMAIN"
+    },
+    {
+      "key": "NEXT_PUBLIC_WHATSAPP",
+      "description": "WhatsApp number for contact",
+      "value": "@NEXT_PUBLIC_WHATSAPP"
+    },
+    {
+      "key": "NEXT_PUBLIC_EMAIL",
+      "description": "Public email for contact",
+      "value": "@NEXT_PUBLIC_EMAIL"
+    }
+  ],
+  "functions": {
+    "api/**/*.ts": {
+      "memory": 1024,
+      "maxDuration": 60
+    }
+  },
+  "redirects": [
+    {
+      "source": "/old-path",
+      "destination": "/",
+      "permanent": true
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600, stale-while-revalidate=86400"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    }
+  ]
+}
