@@ -113,11 +113,11 @@ export default function Hero() {
       <div className="relative z-10 container-max text-center">
         <div className="space-y-6 sm:space-y-8">
           <h1 className="heading-1 text-jun-black leading-tight max-w-4xl mx-auto animate-fade-in">
-            Haz que tu proyecto sea la primera opción en la Riviera Maya
+            Haz que tu proyecto sea la primera opción en Riviera Maya
           </h1>
 
           <p className="text-lg sm:text-xl text-jun-accent max-w-2xl mx-auto animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-            Especialistas en crecimiento digital para real estate y turismo en la Riviera Maya
+            Especialistas en crecimiento digital para real estate y turismo
           </p>
 
           <p className="text-base sm:text-lg text-jun-black/70 max-w-2xl mx-auto leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.2s' }}>

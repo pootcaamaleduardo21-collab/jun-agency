@@ -79,13 +79,13 @@ export default function ContactForm() {
         ) : (
           <form
             onSubmit={handleSubmit}
-            className="bg-white p-8 rounded-sm border border-jun-accent/10"
+            className="bg-white p-8 lg:p-12 rounded-sm border-2 border-jun-sand shadow-lg"
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label
                   htmlFor="name"
-                  className="block text-sm font-semibold text-jun-black mb-2"
+                  className="block text-base font-bold text-jun-black mb-3"
                 >
                   Nombre
                 </label>
@@ -96,7 +96,7 @@ export default function ContactForm() {
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 rounded-sm border border-jun-accent/20 focus:outline-none focus:border-jun-sand focus:ring-1 focus:ring-jun-sand transition-all"
+                  className="w-full px-4 py-4 text-base rounded-sm border-2 border-jun-accent/30 focus:outline-none focus:border-jun-sand focus:ring-2 focus:ring-jun-sand/50 transition-all"
                   placeholder="Tu nombre"
                 />
               </div>
@@ -104,7 +104,7 @@ export default function ContactForm() {
               <div>
                 <label
                   htmlFor="company"
-                  className="block text-sm font-semibold text-jun-black mb-2"
+                  className="block text-base font-bold text-jun-black mb-3"
                 >
                   Empresa o Proyecto
                 </label>
@@ -115,7 +115,7 @@ export default function ContactForm() {
                   value={formData.company}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 rounded-sm border border-jun-accent/20 focus:outline-none focus:border-jun-sand focus:ring-1 focus:ring-jun-sand transition-all"
+                  className="w-full px-4 py-4 text-base rounded-sm border-2 border-jun-accent/30 focus:outline-none focus:border-jun-sand focus:ring-2 focus:ring-jun-sand/50 transition-all"
                   placeholder="Nombre del proyecto"
                 />
               </div>
@@ -125,7 +125,7 @@ export default function ContactForm() {
               <div>
                 <label
                   htmlFor="projectType"
-                  className="block text-sm font-semibold text-jun-black mb-2"
+                  className="block text-base font-bold text-jun-black mb-3"
                 >
                   Tipo de Proyecto
                 </label>
@@ -135,7 +135,7 @@ export default function ContactForm() {
                   value={formData.projectType}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 rounded-sm border border-jun-accent/20 focus:outline-none focus:border-jun-sand focus:ring-1 focus:ring-jun-sand transition-all"
+                  className="w-full px-4 py-4 text-base rounded-sm border-2 border-jun-accent/30 focus:outline-none focus:border-jun-sand focus:ring-2 focus:ring-jun-sand/50 transition-all"
                 >
                   <option value="">Selecciona una opción</option>
                   <option value="real-estate">Real Estate / Inmobiliario</option>
@@ -150,7 +150,7 @@ export default function ContactForm() {
               <div>
                 <label
                   htmlFor="whatsapp"
-                  className="block text-sm font-semibold text-jun-black mb-2"
+                  className="block text-base font-bold text-jun-black mb-3"
                 >
                   WhatsApp
                 </label>
@@ -161,7 +161,7 @@ export default function ContactForm() {
                   value={formData.whatsapp}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 rounded-sm border border-jun-accent/20 focus:outline-none focus:border-jun-sand focus:ring-1 focus:ring-jun-sand transition-all"
+                  className="w-full px-4 py-4 text-base rounded-sm border-2 border-jun-accent/30 focus:outline-none focus:border-jun-sand focus:ring-2 focus:ring-jun-sand/50 transition-all"
                   placeholder="+52 985 108 9671"
                 />
               </div>
@@ -170,7 +170,7 @@ export default function ContactForm() {
             <div className="mb-6">
               <label
                 htmlFor="email"
-                className="block text-sm font-semibold text-jun-black mb-2"
+                className="block text-base font-bold text-jun-black mb-3"
               >
                 Correo
               </label>
@@ -181,7 +181,7 @@ export default function ContactForm() {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 rounded-sm border border-jun-accent/20 focus:outline-none focus:border-jun-sand focus:ring-1 focus:ring-jun-sand transition-all"
+                className="w-full px-4 py-4 text-base rounded-sm border-2 border-jun-accent/30 focus:outline-none focus:border-jun-sand focus:ring-2 focus:ring-jun-sand/50 transition-all"
                 placeholder="tu@email.com"
               />
             </div>
@@ -189,7 +189,7 @@ export default function ContactForm() {
             <div className="mb-8">
               <label
                 htmlFor="needs"
-                className="block text-sm font-semibold text-jun-black mb-2"
+                className="block text-base font-bold text-jun-black mb-3"
               >
                 ¿Qué necesitas mejorar hoy?
               </label>
@@ -199,8 +199,8 @@ export default function ContactForm() {
                 value={formData.needs}
                 onChange={handleChange}
                 required
-                rows={4}
-                className="w-full px-4 py-3 rounded-sm border border-jun-accent/20 focus:outline-none focus:border-jun-sand focus:ring-1 focus:ring-jun-sand transition-all resize-none"
+                rows={5}
+                className="w-full px-4 py-4 text-base rounded-sm border-2 border-jun-accent/30 focus:outline-none focus:border-jun-sand focus:ring-2 focus:ring-jun-sand/50 transition-all resize-none"
                 placeholder="Cuéntanos brevemente qué desafío enfrenta tu proyecto en digital..."
               />
             </div>
@@ -208,12 +208,12 @@ export default function ContactForm() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full cta-primary disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full bg-jun-black text-white font-bold py-4 px-8 rounded-sm hover:bg-jun-dark transition-all duration-300 text-base disabled:opacity-70 disabled:cursor-not-allowed hover:shadow-lg"
             >
               {loading ? 'Enviando...' : 'Solicitar diagnóstico'}
             </button>
 
-            <p className="text-xs text-jun-black/60 text-center mt-4">
+            <p className="text-sm text-jun-black/70 text-center mt-6">
               Al enviar este formulario aceptas que nos pongamos en contacto para discutir tu proyecto.
             </p>
           </form>

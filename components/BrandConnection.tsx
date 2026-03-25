@@ -6,11 +6,11 @@ export default function BrandConnection() {
           Inspirados por una región que exige marcas mejor construidas
         </h2>
 
-        <p className="text-lg text-jun-black/80 leading-relaxed text-center">
-          La Riviera Maya no es solo un destino geográfico. Es un mercado exigente donde conviven proyectos de lujo, inversión real estate, experiencias turísticas y marcas que compiten por atención y percepción. Aquí, la diferencia no la hace solo el marketing. La hace una presencia digital clara, estratégica y alineada con el valor real del proyecto.
+        <p className="text-xl text-jun-black leading-relaxed text-center font-medium">
+          Riviera Maya no es solo un destino geográfico. Es un mercado exigente donde conviven proyectos de lujo, inversión real estate, experiencias turísticas y marcas que compiten por atención y percepción. Aquí, la diferencia no la hace solo el marketing. La hace una presencia digital clara, estratégica y alineada con el valor real del proyecto.
         </p>
 
-        <p className="text-lg text-jun-black/80 leading-relaxed text-center mt-6">
+        <p className="text-xl text-jun-black leading-relaxed text-center mt-8 font-medium">
           Trabajamos desde la comprensión profunda de este mercado: sus dinámicas, sus clientes, sus competencias y las oportunidades únicas que abre el crecimiento digital bien ejecutado.
         </p>
       </div>

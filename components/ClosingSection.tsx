@@ -9,11 +9,11 @@ export default function ClosingSection() {
           Necesita una estrategia que lo haga avanzar mejor
         </h2>
 
-        <p className="text-lg text-white/80 leading-relaxed text-center mb-12">
+        <p className="text-xl text-white leading-relaxed text-center mb-12 font-medium">
           El mercado está saturado de presencia digital sin dirección. Proyectos que están en línea pero no convierten. Marcas que tienen contenido pero no posicionamiento. Campañas que gastan pero no generan resultado.
         </p>
 
-        <p className="text-lg text-white/80 leading-relaxed text-center mb-12">
+        <p className="text-xl text-white leading-relaxed text-center mb-12 font-medium">
           En JUN creemos que tu proyecto merece más. Merece una presencia digital construida con propósito. Merece estrategia, claridad y ejecución. Merece crecer.
         </p>
 
