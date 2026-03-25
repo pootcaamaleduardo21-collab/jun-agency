@@ -1,79 +1,87 @@
 'use client';
+import { useRef } from 'react';
+import { useScrollReveal } from './useScrollReveal';
 
-import { motion } from 'framer-motion';
+const INFO = [
+  { label: 'JUN en maya', value: 'El primero' },
+  { label: 'Origen', value: 'La Riviera Maya' },
+  { label: 'Especialidad', value: 'Real estate y turismo' },
+  { label: 'Enfoque', value: 'Estrategia + Conversión' },
+];
 
-const BrandConnection = () => {
+export default function BrandConnection() {
+  const sectionRef = useRef<HTMLElement>(null);
+  useScrollReveal(sectionRef);
+
   return (
-    <section className="section section-dark">
-      <div className="container max-w-4xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true, margin: '-100px' }}
-          className="space-y-10 text-center"
-        >
-          {/* Title */}
-          <h2 className="text-4xl md:text-5xl font-bold leading-tight">
-            Inspirados por una región que exige marcas mejor construidas
-          </h2>
+    <section
+      ref={sectionRef}
+      className="relative bg-[#080808] py-32 px-6 md:px-12 overflow-hidden"
+      aria-labelledby="brand-heading"
+    >
+      {/* Subtle grid texture */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage:
+            'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,0.5) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,0.5) 40px)',
+        }}
+      />
 
-          {/* Description */}
-          <div className="space-y-6 text-lg text-gray-400 leading-relaxed max-w-3xl mx-auto">
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              viewport={{ once: true, margin: '-100px' }}
-            >
-              Riviera Maya no es solo un destino. Es un mercado competitivo donde{' '}
-              <span className="font-bold text-white">el valor, la claridad y la diferenciación</span> definen quién
-              prospera y quién queda atrás.
-            </motion.p>
+      <div className="max-w-7xl mx-auto relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.15 }}
-              viewport={{ once: true, margin: '-100px' }}
+          {/* Left */}
+          <div className="reveal">
+            <p
+              className="text-xs tracking-[0.22em] uppercase mb-6"
+              style={{ color: 'var(--sand)', fontWeight: 700 }}
             >
-              Los proyectos que ganan aquí son los que comunican con seguridad, que entienden su posicionamiento
-              real y que construyen presencia digital con intención.
-            </motion.p>
-
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              viewport={{ once: true, margin: '-100px' }}
-            >
-              JUN nace de esa realidad. Somos el aliado que entiende el mercado local, combina estrategia global
-              con insights territoriales, y sabe cómo convertir claridad en crecimiento.
-            </motion.p>
+              JUN — El primero
+            </p>
+            <h2 id="brand-heading" className="text-4xl md:text-5xl mb-8" style={{ fontWeight: 700 }}>
+              Inspirados por una región que exige marcas mejor construidas.
+            </h2>
+            <p className="text-white/60 text-lg leading-relaxed mb-6">
+              En la Riviera Maya no compites con negocios locales. Compites con marcas
+              internacionales que invierten en percepción, posicionamiento y estrategia.
+            </p>
+            <p className="text-white/60 text-lg leading-relaxed">
+              JUN nace de entender que en este mercado, tu proyecto merece ser visto, reconocido y
+              elegido. Por eso construimos presencia digital con intención: clara, estratégica y
+              orientada a que tu marca destaque.
+            </p>
           </div>
 
-          {/* Accent phrase */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.25 }}
-            viewport={{ once: true, margin: '-100px' }}
-            className="mac-window p-8 md:p-12 mt-10"
+          {/* Right */}
+          <div
+            className="rounded-2xl overflow-hidden reveal reveal-delay-2"
+            style={{ border: '1px solid rgba(255,255,255,0.07)' }}
           >
-            <div className="mac-header -mx-8 -mt-12 md:-mx-12 md:-mt-12 mb-6">
-              <div className="mac-dot mac-dot-red" />
-              <div className="mac-dot mac-dot-yellow" />
-              <div className="mac-dot mac-dot-green" />
-            </div>
-            <p className="text-2xl md:text-3xl font-bold mb-4">
-              "El primero en su categoría. El que marca dirección."
-            </p>
-            <p className="text-sm text-gray-400">JUN significa "el primero" en la lengua maya.</p>
-          </motion.div>
-        </motion.div>
+            {INFO.map((item, i) => (
+              <div
+                key={i}
+                className="flex items-center justify-between px-8 py-6 border-b hover:bg-white/4 transition-colors group"
+                style={{ borderColor: 'rgba(255,255,255,0.07)' }}
+              >
+                <span
+                  className="text-sm uppercase tracking-widest text-white/40"
+                  style={{ fontWeight: 600 }}
+                >
+                  {item.label}
+                </span>
+                <span
+                  className="text-base group-hover:text-[var(--sand)] transition-colors"
+                  style={{ fontWeight: 700 }}
+                >
+                  {item.value}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );
-};
-
-export default BrandConnection;
+}

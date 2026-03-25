@@ -1,93 +1,93 @@
 'use client';
+import { useRef } from 'react';
+import { useScrollReveal } from './useScrollReveal';
 
-import { motion } from 'framer-motion';
+export default function ValueProposition() {
+  const sectionRef = useRef<HTMLElement>(null);
+  useScrollReveal(sectionRef);
 
-const ValueProposition = () => {
+  const pillars = [
+    {
+      label: 'Estrategia',
+      title: 'Dirección antes que ejecución',
+      desc: 'Cada acción parte de un diagnóstico real. Sin dirección clara, el marketing no construye — solo gasta.',
+    },
+    {
+      label: 'Producción',
+      title: 'Contenido que comunica valor',
+      desc: 'Producimos con intención visual y comercial. Cada pieza comunica el nivel real de tu proyecto o marca.',
+    },
+    {
+      label: 'Posicionamiento',
+      title: 'Percepción que genera preferencia',
+      desc: 'Construimos cómo te ven. En mercados competitivos, quién te conoce primero y mejor es quien crece.',
+    },
+  ];
+
   return (
-    <section className="section section-dark relative overflow-hidden">
-      {/* Background elements */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/2 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
-      </div>
+    <section
+      ref={sectionRef}
+      className="bg-[#0e0e0e] py-32 px-6 md:px-12"
+      aria-labelledby="value-prop-heading"
+    >
+      <div className="max-w-7xl mx-auto">
 
-      <div className="container relative z-10 max-w-4xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true, margin: '-100px' }}
-          className="space-y-10"
-        >
-          {/* Main Title */}
-          <div>
-            <h2 className="text-4xl md:text-5xl font-bold leading-tight mb-6">
-              No hacemos marketing por hacerlo.
-            </h2>
-            <h2 className="text-4xl md:text-5xl font-bold leading-tight">
-              <span className="gradient-text">
-                Construimos una presencia digital con intención.
-              </span>
-            </h2>
-          </div>
-
-          {/* Description */}
-          <div className="space-y-6 text-lg text-gray-400 leading-relaxed">
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              viewport={{ once: true, margin: '-100px' }}
-              className="text-white text-xl"
-            >
-              JUN une <span className="font-bold">estrategia</span>, <span className="font-bold">producción de contenido</span> y{' '}
-              <span className="font-bold">ejecución digital</span> para que proyectos, espacios y marcas se posicionen
-              como referentes en un mercado competitivo.
-            </motion.p>
-
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.15 }}
-              viewport={{ once: true, margin: '-100px' }}
-            >
-              Entendemos que comunicar valor en Riviera Maya es complejo. El mercado es exigente, la competencia es
-              visual, y los prospectos buscan proyectos que transmitan claridad, seguridad y diferenciación real.
-            </motion.p>
-
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              viewport={{ once: true, margin: '-100px' }}
-            >
-              Por eso cada estrategia comienza con un diagnóstico profundo. Identificamos qué comunicas, cómo lo
-              comunicas, y qué ajustes necesitas para convertir mejor.
-            </motion.p>
-          </div>
-
-          {/* Key Phrase */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            viewport={{ once: true, margin: '-100px' }}
-            className="mac-window p-8 md:p-10"
+        {/* Big statement */}
+        <div className="max-w-5xl mb-24 reveal">
+          <p
+            className="text-xs tracking-[0.2em] uppercase mb-8"
+            style={{ color: 'var(--sand)', fontWeight: 700 }}
           >
-            <div className="mac-header -mx-8 -mt-10 md:-mx-10 md:-mt-10 mb-6">
-              <div className="mac-dot mac-dot-red" />
-              <div className="mac-dot mac-dot-yellow" />
-              <div className="mac-dot mac-dot-green" />
+            Nuestra filosofía
+          </p>
+          <h2
+            id="value-prop-heading"
+            className="text-5xl md:text-6xl xl:text-7xl mb-10"
+            style={{ fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1 }}
+          >
+            No hacemos solo marketing.{' '}
+            <span className="text-white/30">
+              Construimos una presencia digital con intención.
+            </span>
+          </h2>
+          <p className="text-xl text-white/55 max-w-2xl leading-relaxed">
+            JUN une estrategia, producción de contenido y ejecución digital para ayudar a
+            proyectos a posicionarse mejor en un mercado exigente. En la Riviera Maya, diferenciarse
+            no es opcional.
+          </p>
+        </div>
+
+        {/* 3 pillars */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/7">
+          {pillars.map((p, i) => (
+            <div
+              key={i}
+              className={`bg-[#0e0e0e] px-10 py-12 group hover:bg-white/4 transition-colors reveal reveal-delay-${i + 1}`}
+            >
+              <p
+                className="text-xs tracking-[0.2em] uppercase mb-5"
+                style={{ color: 'var(--sand)', fontWeight: 700 }}
+              >
+                {p.label}
+              </p>
+              <h3 className="text-xl mb-4" style={{ fontWeight: 700 }}>{p.title}</h3>
+              <p className="text-sm text-white/50 leading-relaxed">{p.desc}</p>
             </div>
-            <p className="text-2xl md:text-3xl font-bold">
-              <span className="gradient-text">
-                Más que presencia: dirección, percepción y crecimiento digital.
-              </span>
-            </p>
-          </motion.div>
-        </motion.div>
+          ))}
+        </div>
+
+        {/* Closing quote */}
+        <div className="mt-24 pt-12 border-t border-white/8 reveal">
+          <blockquote
+            className="text-2xl md:text-3xl text-white/65 max-w-3xl leading-relaxed"
+            style={{ fontWeight: 700 }}
+          >
+            &ldquo;Más que presencia:{' '}
+            <span className="text-white">dirección, percepción y crecimiento digital</span>{' '}
+            para proyectos que lo merecen.&rdquo;
+          </blockquote>
+        </div>
       </div>
     </section>
   );
-};
-
-export default ValueProposition;
+}

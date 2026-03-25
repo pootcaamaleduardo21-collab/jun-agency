@@ -1,12 +1,12 @@
+import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import TrustBand from '@/components/TrustBand';
-import InteractiveShowcase from '@/components/InteractiveShowcase';
 import ProblemSection from '@/components/ProblemSection';
 import ValueProposition from '@/components/ValueProposition';
-import ServicesShowcase from '@/components/ServicesShowcase';
-import TargetAudience from '@/components/TargetAudience';
+import Services from '@/components/Services';
 import HowWeWork from '@/components/HowWeWork';
 import BrandConnection from '@/components/BrandConnection';
+import TargetAudience from '@/components/TargetAudience';
 import ClosingCTA from '@/components/ClosingCTA';
 import FAQ from '@/components/FAQ';
 import ContactForm from '@/components/ContactForm';
@@ -15,40 +15,38 @@ import Footer from '@/components/Footer';
 export default function Home() {
   return (
     <main className="overflow-hidden">
-      {/* Hero */}
+      <Navbar />
+      {/* 1. Hero Principal */}
       <Hero />
 
-      {/* Trust Band */}
+      {/* 2. Franja de Confianza */}
       <TrustBand />
 
-      {/* Interactive Showcase */}
-      <InteractiveShowcase />
-
-      {/* Problem Section */}
+      {/* 3. Sección Problema */}
       <ProblemSection />
 
-      {/* Value Proposition */}
+      {/* 4. Propuesta de Valor */}
       <ValueProposition />
 
-      {/* Services Showcase - Highlighted */}
-      <ServicesShowcase />
+      {/* 5. Servicios */}
+      <Services />
 
-      {/* Target Audience - Highlighted */}
-      <TargetAudience />
-
-      {/* How We Work */}
+      {/* 6. Cómo Trabajamos */}
       <HowWeWork />
 
-      {/* Brand Connection */}
+      {/* 7. Conexión de Marca */}
       <BrandConnection />
 
-      {/* Closing CTA */}
+      {/* 8. Para Quién es JUN */}
+      <TargetAudience />
+
+      {/* 9. Cierre de Valor */}
       <ClosingCTA />
 
-      {/* FAQ */}
+      {/* 10. FAQ */}
       <FAQ />
 
-      {/* Contact Form */}
+      {/* 11. Formulario de Contacto */}
       <ContactForm />
 
       {/* Footer */}
