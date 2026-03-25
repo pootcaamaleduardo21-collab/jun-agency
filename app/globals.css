@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply m-0 p-0 box-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-jun-light text-jun-black;
+    font-family: 'Satoshi', 'Poppins', sans-serif;
+    line-height: 1.6;
+  }
+
+  @font-face {
+    font-family: 'Satoshi';
+    src: url('https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&display=swap');
+  }
+}
+
+@layer components {
+  .container-max {
+    @apply mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl;
+  }
+
+  .heading-1 {
+    @apply text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight;
+  }
+
+  .heading-2 {
+    @apply text-3xl sm:text-4xl lg:text-5xl font-bold;
+  }
+
+  .heading-3 {
+    @apply text-2xl sm:text-3xl font-bold;
+  }
+
+  .text-base-p {
+    @apply text-base sm:text-lg leading-relaxed;
+  }
+
+  .cta-primary {
+    @apply inline-flex items-center justify-center px-8 py-4 bg-jun-black text-white rounded-sm font-semibold transition-all duration-300 hover:bg-jun-dark hover:shadow-lg active:scale-95;
+  }
+
+  .cta-secondary {
+    @apply inline-flex items-center justify-center px-8 py-4 border-2 border-jun-black text-jun-black rounded-sm font-semibold transition-all duration-300 hover:bg-jun-black hover:text-white active:scale-95;
+  }
+
+  .section-padding {
+    @apply py-16 sm:py-24 lg:py-32;
+  }
+
+  .glass-effect {
+    @apply backdrop-blur-sm bg-white/10 border border-white/20;
+  }
+}
+
+@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+  @layer components {
+    .backdrop-blur-light {
+      -webkit-backdrop-filter: blur(4px);
+      backdrop-filter: blur(4px);
+    }
+  }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
