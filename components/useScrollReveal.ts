@@ -1,10 +1,12 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
 /**
  * useScrollReveal
- * Adds the `is-visible` class to a container element's children
+ * Adds the `visible` class to a container element's children
  * that carry the `reveal` class as they enter the viewport.
+ *
+ * NOTE: class name is `visible` (to match `.reveal.visible` in globals.css)
  */
 export function useScrollReveal(containerRef: React.RefObject<HTMLElement | null>) {
   useEffect(() => {
@@ -18,15 +20,24 @@ export function useScrollReveal(containerRef: React.RefObject<HTMLElement | null
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
+            entry.target.classList.add('visible');
             observer.unobserve(entry.target);
           }
         });
       },
-      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+      { threshold: 0.06, rootMargin: '0px 0px 60px 0px' }
     );
 
-    targets.forEach((el) => observer.observe(el));
+    // Immediately show elements already in the viewport on mount
+    targets.forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight) {
+        el.classList.add('visible');
+      } else {
+        observer.observe(el);
+      }
+    });
+
     return () => observer.disconnect();
   }, [containerRef]);
 }

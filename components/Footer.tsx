@@ -1,5 +1,4 @@
 'use client';
-import { Logo } from './Logo';
 
 const SOCIAL_LINKS = [
   {
@@ -8,7 +7,7 @@ const SOCIAL_LINKS = [
     handle: '@junmktmx',
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+        <rect x="2" y="2" width="20" height="20" rx="5"/>
         <circle cx="12" cy="12" r="4"/>
         <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
       </svg>
@@ -40,22 +39,25 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#0a0a0a] border-t border-white/8 px-6 md:px-12 py-16" role="contentinfo">
+    <footer className="bg-[#0a0a0a] border-t border-white/[0.08] px-6 md:px-12 py-16" role="contentinfo">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
 
-          {/* Brand col */}
+          {/* Brand */}
           <div className="md:col-span-2">
-            <div className="mb-5">
-              <Logo variant="cream" height={32} />
+            <div
+              className="text-2xl text-white mb-4 tracking-[0.08em]"
+              style={{ fontWeight: 700, fontFamily: 'Satoshi, sans-serif' }}
+            >
+              JUN
             </div>
-            <p className="text-sm text-white/55 leading-relaxed max-w-xs mb-8">
-              Agencia de marketing digital especializada en crecimiento, estrategia
-              y conversión para real estate y turismo en la Riviera Maya.
+            <p className="text-sm text-white/70 leading-relaxed max-w-xs mb-8">
+              Agencia de marketing digital especializada en crecimiento,
+              estrategia y conversión para real estate y turismo en la Riviera Maya.
             </p>
 
             {/* Social icons */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               {SOCIAL_LINKS.map((s) => (
                 <a
                   key={s.label}
@@ -63,23 +65,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`Síguenos en ${s.label} — ${s.handle}`}
-                  className="flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-300 group"
-                  style={{
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    color: 'rgba(255,255,255,0.45)',
-                  }}
-                  onMouseEnter={(e) => {
-                    const el = e.currentTarget;
-                    el.style.borderColor = 'rgba(212,175,154,0.5)';
-                    el.style.color = 'var(--sand)';
-                    el.style.background = 'rgba(212,175,154,0.06)';
-                  }}
-                  onMouseLeave={(e) => {
-                    const el = e.currentTarget;
-                    el.style.borderColor = 'rgba(255,255,255,0.1)';
-                    el.style.color = 'rgba(255,255,255,0.45)';
-                    el.style.background = 'transparent';
-                  }}
+                  className="flex items-center justify-center w-10 h-10 rounded-xl text-white/45 border border-white/[0.12] hover:text-[var(--sand)] hover:border-[var(--sand)]/40 hover:bg-[var(--sand)]/5 transition-all duration-300"
                 >
                   {s.icon}
                 </a>
@@ -87,9 +73,9 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Nav */}
+          {/* Nav links */}
           <div>
-            <p className="text-xs uppercase tracking-widest text-white/40 mb-5" style={{ fontWeight: 700 }}>
+            <p className="text-xs uppercase tracking-widest text-white/45 mb-5" style={{ fontWeight: 700 }}>
               Navegación
             </p>
             <ul className="space-y-3">
@@ -100,7 +86,7 @@ export default function Footer() {
                 ['Contacto', '#formulario'],
               ].map(([label, href]) => (
                 <li key={label}>
-                  <a href={href} className="text-sm text-white/55 hover:text-[var(--sand)] transition-colors" style={{ fontWeight: 500 }}>
+                  <a href={href} className="text-sm text-white/65 hover:text-[var(--sand)] transition-colors" style={{ fontWeight: 500 }}>
                     {label}
                   </a>
                 </li>
@@ -110,26 +96,26 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <p className="text-xs uppercase tracking-widest text-white/40 mb-5" style={{ fontWeight: 700 }}>
+            <p className="text-xs uppercase tracking-widest text-white/45 mb-5" style={{ fontWeight: 700 }}>
               Contacto
             </p>
             <ul className="space-y-3">
               <li>
-                <a href="mailto:informes@junmkt.com" className="text-sm text-white/55 hover:text-[var(--sand)] transition-colors">
+                <a href="mailto:informes@junmkt.com" className="text-sm text-white/65 hover:text-[var(--sand)] transition-colors">
                   informes@junmkt.com
                 </a>
               </li>
               <li>
-                <a href="tel:+529851089671" className="text-sm text-white/55 hover:text-[var(--sand)] transition-colors">
+                <a href="tel:+529851089671" className="text-sm text-white/65 hover:text-[var(--sand)] transition-colors">
                   +52 985 108 9671
                 </a>
               </li>
               <li className="pt-2">
                 <a
-                  href="https://wa.me/9851089671?text=Hola%20JUN%2C%20me%20gustar%C3%ADa%20recibir%20m%C3%A1s%20detalles%20para%20mi%20negocio"
+                  href="https://wa.me/9851089671?text=Hola%20JUN%2C%20me%20gustar%C3%ADa%20recibir%20m%C3%A1s%20detalles"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm hover:text-cream transition-colors"
+                  className="inline-flex items-center gap-2 text-sm transition-colors"
                   style={{ color: 'var(--sand)', fontWeight: 700 }}
                 >
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -144,8 +130,8 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-white/8 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-white/30">© {year} JUN Agency. Todos los derechos reservados.</p>
+        <div className="border-t border-white/[0.08] pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-white/35">© {year} JUN Agency. Todos los derechos reservados.</p>
           <div className="flex items-center gap-5">
             {SOCIAL_LINKS.map((s) => (
               <a
@@ -153,15 +139,14 @@ export default function Footer() {
                 href={s.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={s.label}
-                className="text-xs text-white/30 hover:text-[var(--sand)] transition-colors"
+                className="text-xs text-white/35 hover:text-[var(--sand)] transition-colors"
                 style={{ fontWeight: 500 }}
               >
                 {s.label}
               </a>
             ))}
           </div>
-          <p className="text-xs text-white/25">La Riviera Maya, México</p>
+          <p className="text-xs text-white/30">La Riviera Maya, México</p>
         </div>
       </div>
     </footer>

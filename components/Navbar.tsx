@@ -1,6 +1,5 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Logo } from './Logo';
 
 const NAV_LINKS = [
   ['Servicios', '#servicios'],
@@ -15,7 +14,7 @@ const SOCIAL_LINKS = [
     href: 'https://www.instagram.com/junmktmx/',
     icon: (
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+        <rect x="2" y="2" width="20" height="20" rx="5"/>
         <circle cx="12" cy="12" r="4"/>
         <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
       </svg>
@@ -25,7 +24,7 @@ const SOCIAL_LINKS = [
     label: 'Facebook',
     href: 'https://www.facebook.com/profile.php?id=61583690176384',
     icon: (
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
         <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
       </svg>
     ),
@@ -34,7 +33,7 @@ const SOCIAL_LINKS = [
     label: 'TikTok',
     href: 'https://www.tiktok.com/@junmktmx',
     icon: (
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
         <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.17 8.17 0 0 0 4.77 1.52V6.73a4.85 4.85 0 0 1-1-.04z"/>
       </svg>
     ),
@@ -57,16 +56,19 @@ export default function Navbar() {
     <header
       role="banner"
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? 'bg-[#080808]/95 backdrop-blur-md border-b border-white/8'
-          : 'bg-transparent'
+        scrolled ? 'bg-[#080808]/95 backdrop-blur-md border-b border-white/[0.08]' : 'bg-transparent'
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 md:px-12 h-16 flex items-center justify-between">
 
-        {/* Logo */}
-        <a href="#" aria-label="JUN Agency — Inicio">
-          <Logo variant="cream" height={28} />
+        {/* Wordmark */}
+        <a
+          href="#"
+          aria-label="JUN Agency — Inicio"
+          className="text-xl text-white hover:text-[var(--sand)] transition-colors duration-300"
+          style={{ fontWeight: 700, fontFamily: 'Satoshi, sans-serif', letterSpacing: '0.08em' }}
+        >
+          JUN
         </a>
 
         {/* Desktop nav */}
@@ -83,10 +85,9 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* Right: social icons + CTA */}
+        {/* Right: social + CTA */}
         <div className="hidden md:flex items-center gap-4">
-          {/* Social icons */}
-          <div className="flex items-center gap-3 mr-2">
+          <div className="flex items-center gap-4 mr-1">
             {SOCIAL_LINKS.map((s) => (
               <a
                 key={s.label}
@@ -100,7 +101,6 @@ export default function Navbar() {
               </a>
             ))}
           </div>
-
           <a
             href="#formulario"
             id="nav-cta"
@@ -114,7 +114,7 @@ export default function Navbar() {
         {/* Mobile hamburger */}
         <button
           onClick={() => setOpen(!open)}
-          className="md:hidden text-white p-2 rounded-md"
+          className="md:hidden text-white p-2"
           aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
           aria-expanded={open}
           aria-controls="mobile-menu"
@@ -135,20 +135,22 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {open && (
-        <div id="mobile-menu" className="md:hidden bg-[#080808] border-t border-white/8 px-6 py-8 flex flex-col gap-6">
+        <div
+          id="mobile-menu"
+          className="md:hidden bg-[#080808] border-t border-white/[0.08] px-6 py-8 flex flex-col gap-6"
+        >
           {NAV_LINKS.map(([label, href]) => (
             <a
               key={label}
               href={href}
               onClick={closeMenu}
-              className="text-white/80 text-lg hover:text-[var(--sand)] transition-colors"
+              className="text-white/85 text-lg hover:text-[var(--sand)] transition-colors"
               style={{ fontWeight: 600, fontFamily: 'Satoshi, sans-serif' }}
             >
               {label}
             </a>
           ))}
-          {/* Social in mobile menu */}
-          <div className="flex items-center gap-5 pt-2">
+          <div className="flex items-center gap-5 pt-1">
             {SOCIAL_LINKS.map((s) => (
               <a
                 key={s.label}
@@ -166,7 +168,7 @@ export default function Navbar() {
           <a
             href="#formulario"
             onClick={closeMenu}
-            className="mt-2 px-5 py-3.5 bg-white text-black text-center rounded-lg hover:bg-[var(--sand)] transition-all duration-300"
+            className="mt-1 px-5 py-3.5 bg-white text-black text-center rounded-lg hover:bg-[var(--sand)] transition-all duration-300"
             style={{ fontWeight: 700, fontFamily: 'Satoshi, sans-serif' }}
           >
             Diagnóstico estratégico

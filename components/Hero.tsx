@@ -1,6 +1,5 @@
 'use client';
 import { useEffect, useRef } from 'react';
-import { Logo } from './Logo';
 
 /* ─────────────────────────────────────────────────────────────────────
    JUN Hero V3 — Maximum mouse responsiveness + visual density
@@ -340,14 +339,6 @@ export default function Hero() {
         <div className="w-px h-12 animate-pulse" style={{background:'linear-gradient(to bottom,rgba(212,175,154,0.55),transparent)'}} />
       </div>
 
-      {/* Logo watermark (very subtle, top-right) */}
-      <div
-        className="absolute top-24 right-8 md:right-16 z-0 pointer-events-none select-none"
-        aria-hidden="true"
-        style={{opacity:0.04}}
-      >
-        <Logo variant="cream" height={110} />
-      </div>
     </section>
   );
 }
