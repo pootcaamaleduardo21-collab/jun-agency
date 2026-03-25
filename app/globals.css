@@ -1,8 +1,11 @@
 /* ═══════════════════════════════════════════════════════════════════
    JUN Agency — Global Design System
-   Fonts: Satoshi (Fontshare CDN)
-   Palette: near-black (#080808) · sand (#D4AF9A) · cream (#F5F1ED)
+   IMPORTANT: @tailwind directives MUST come first
 ═══════════════════════════════════════════════════════════════════ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* ── Fonts ─────────────────────────────────────────────────────── */
 @import url('https://api.fontshare.com/v2/css?f[]=satoshi@700,500,400&display=swap');
@@ -17,17 +20,6 @@
   --surface-1:  #0e0e0e;
   --surface-2:  #141414;
   --border:     rgba(255, 255, 255, 0.09);
-
-  /* Typography scale */
-  --fs-xs:   0.75rem;
-  --fs-sm:   0.875rem;
-  --fs-base: 1rem;
-  --fs-lg:   1.125rem;
-
-  /* Body text visibility: minimum 65% opacity for readability */
-  --text-muted:  rgba(255, 255, 255, 0.70);
-  --text-dimmer: rgba(255, 255, 255, 0.50);
-  --text-faint:  rgba(255, 255, 255, 0.35);
 }
 
 /* ── Reset & Base ──────────────────────────────────────────────── */
@@ -100,46 +92,24 @@ p, li, span, a {
 .reveal-delay-4 { transition-delay: 0.42s; }
 .reveal-delay-5 { transition-delay: 0.55s; }
 
-/* ── Card hover lift effect ────────────────────────────────────── */
+/* ── Card hover lift ───────────────────────────────────────────── */
 .card-hover {
   transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
-              box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.3s ease,
               background 0.3s ease;
 }
 
 .card-hover:hover {
   transform: translateY(-4px);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(212, 175, 154, 0.12);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35),
+              0 0 0 1px rgba(212, 175, 154, 0.12);
 }
 
-/* ── Glow button effect ────────────────────────────────────────── */
-.btn-glow:hover {
-  box-shadow: 0 8px 30px rgba(212, 175, 154, 0.28);
-}
-
-/* ── Magnetic CTA underline ────────────────────────────────────── */
-.link-arrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: gap 0.3s ease;
-}
-
-.link-arrow:hover {
-  gap: 1rem;
-}
-
-/* ── Horizontal rule ───────────────────────────────────────────── */
-hr {
-  border: none;
-  border-top: 1px solid var(--border);
-}
-
-/* ── Form field base ───────────────────────────────────────────── */
+/* ── Form field ────────────────────────────────────────────────── */
 .field-input {
   width: 100%;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.20);
   border-radius: 8px;
   padding: 14px 16px;
   color: #fff;
@@ -147,62 +117,33 @@ hr {
   font-size: 0.9375rem;
   font-weight: 500;
   outline: none;
-  transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+  transition: border-color 0.22s ease,
+              background 0.22s ease,
+              box-shadow 0.22s ease;
+  -webkit-appearance: none;
 }
 
 .field-input::placeholder {
-  color: rgba(255, 255, 255, 0.30);
+  color: rgba(255, 255, 255, 0.32);
 }
 
 .field-input:hover {
-  border-color: rgba(255, 255, 255, 0.30);
-  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.32);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .field-input:focus {
   border-color: var(--sand);
-  background: rgba(255, 255, 255, 0.06);
-  box-shadow: 0 0 0 3px rgba(212, 175, 154, 0.12);
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 0 0 3px rgba(212, 175, 154, 0.14);
 }
 
-.field-input:focus::placeholder {
-  color: rgba(255, 255, 255, 0.20);
-}
-
-/* Select field style */
 .field-input option {
   background: #111;
   color: #fff;
 }
 
-/* ── CSS counter animation (number reveal) ─────────────────────── */
-@keyframes count-up {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: none; }
+/* ── border-white/8 utility (commonly needed) ──────────────────── */
+.border-white\/8 {
+  border-color: rgba(255, 255, 255, 0.08);
 }
-
-.stat-number {
-  animation: count-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-/* ── Pulse ring animation ──────────────────────────────────────── */
-@keyframes ring-pulse {
-  0%   { transform: scale(0.95); opacity: 0.5; }
-  70%  { transform: scale(1.05); opacity: 0; }
-  100% { transform: scale(0.95); opacity: 0; }
-}
-
-/* ── Scroll indicator ──────────────────────────────────────────── */
-@keyframes scroll-fade {
-  0%, 100% { opacity: 0.45; transform: scaleY(1); }
-  50%       { opacity: 1;    transform: scaleY(1.2); }
-}
-
-/* ── Tailwind overrides for better visibility ──────────────────── */
-.text-white\/50 { color: rgba(255, 255, 255, 0.65) !important; }
-.text-white\/40 { color: rgba(255, 255, 255, 0.55) !important; }
-.text-white\/30 { color: rgba(255, 255, 255, 0.48) !important; }
-.text-white\/25 { color: rgba(255, 255, 255, 0.42) !important; }
-.text-white\/20 { color: rgba(255, 255, 255, 0.38) !important; }
-.text-white\/60 { color: rgba(255, 255, 255, 0.75) !important; }
-.text-white\/70 { color: rgba(255, 255, 255, 0.82) !important; }
