@@ -1,5 +1,7 @@
+'use client';
+
+import dynamic from 'next/dynamic';
 import Navbar from '@/components/Navbar';
-import Hero from '@/components/Hero';
 import TrustBand from '@/components/TrustBand';
 import ProblemSection from '@/components/ProblemSection';
 import ValueProposition from '@/components/ValueProposition';
@@ -11,6 +13,18 @@ import ClosingCTA from '@/components/ClosingCTA';
 import FAQ from '@/components/FAQ';
 import ContactForm from '@/components/ContactForm';
 import Footer from '@/components/Footer';
+
+// Dynamic import with ssr:false prevents the canvas RAF loop from
+// running during Next.js static generation (avoids timeout)
+const Hero = dynamic(() => import('@/components/Hero'), {
+  ssr: false,
+  loading: () => (
+    <div
+      className="min-h-screen bg-[#080808]"
+      aria-label="Cargando sección principal…"
+    />
+  ),
+});
 
 export default function Home() {
   return (
