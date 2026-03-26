@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 interface FormPayload {
   nombre: string;
   empresa: string;
@@ -14,6 +12,14 @@ interface FormPayload {
 
 export async function POST(req: NextRequest) {
   try {
+    if (!process.env.RESEND_API_KEY) {
+      return NextResponse.json(
+        { error: 'Servicio de email no configurado.' },
+        { status: 500 }
+      );
+    }
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
     const body: FormPayload = await req.json();
 
     const { nombre, empresa, tipoProyecto, whatsapp, email, necesidades } = body;
