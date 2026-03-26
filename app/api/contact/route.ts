@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     // ── 1. Send email via Resend ───────────────────────────────────
     const { error: emailError } = await resend.emails.send({
       from: 'JUN Agency <noreply@junmkt.com>',
-      to: ['informes@junmkt.com'],
+      to: ['informesjunmkt@gmail.com'],
       replyTo: email,
       subject: `Nuevo diagnóstico estratégico — ${nombre} (${empresa})`,
       html: `

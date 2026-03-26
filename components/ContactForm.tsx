@@ -114,7 +114,7 @@ export default function ContactForm() {
                 </div>
               </a>
 
-              <a href="mailto:informes@junmkt.com" className="flex items-center gap-4 group">
+              <a href="mailto:informesjunmkt@gmail.com" className="flex items-center gap-4 group">
                 <div
                   className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors group-hover:bg-[var(--sand)]/20"
                   style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)' }}
@@ -126,7 +126,7 @@ export default function ContactForm() {
                 </div>
                 <div>
                   <div className="text-xs uppercase tracking-widest mb-0.5" style={{ color: 'rgba(255,255,255,0.42)', fontWeight: 600 }}>CORREO</div>
-                  <div className="text-base group-hover:text-[var(--sand)] transition-colors" style={{ fontWeight: 700, color: '#fff' }}>informes@junmkt.com</div>
+                  <div className="text-base group-hover:text-[var(--sand)] transition-colors" style={{ fontWeight: 700, color: '#fff' }}>informesjunmkt@gmail.com</div>
                 </div>
               </a>
             </div>

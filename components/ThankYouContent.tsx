@@ -206,10 +206,10 @@ export default function ThankYouContent() {
             <p>
               Escríbenos a{' '}
               <a
-                href="mailto:informes@junmkt.com"
+                href="mailto:informesjunmkt@gmail.com"
                 className="text-[var(--sand)] hover:underline font-semibold"
               >
-                informes@junmkt.com
+                informesjunmkt@gmail.com
               </a>
             </p>
           </div>

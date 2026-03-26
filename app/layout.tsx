@@ -85,7 +85,7 @@ const schemaOrg = {
       contactPoint: {
         '@type': 'ContactPoint',
         contactType: 'Customer Service',
-        email: 'informes@junmkt.com',
+        email: 'informesjunmkt@gmail.com',
         telephone: '+52-985-108-9671',
         availableLanguage: 'Spanish',
       },

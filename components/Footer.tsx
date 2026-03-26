@@ -96,8 +96,8 @@ export default function Footer() {
             </p>
             <ul className="space-y-3">
               <li>
-                <a href="mailto:informes@junmkt.com" className="text-sm text-white/65 hover:text-[var(--sand)] transition-colors">
-                  informes@junmkt.com
+                <a href="mailto:informesjunmkt@gmail.com" className="text-sm text-white/65 hover:text-[var(--sand)] transition-colors">
+                  informesjunmkt@gmail.com
                 </a>
               </li>
               <li>
