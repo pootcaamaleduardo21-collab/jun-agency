@@ -23,7 +23,7 @@ export default function ContactForm() {
   const [state, setState] = useState<FormState>('idle');
   const [errorMsg, setErrorMsg] = useState('');
   const [fields, setFields] = useState({
-    name: '', company: '', tipo: '', whatsapp: '', email: '', message: '',
+    nombre: '', empresa: '', tipoProyecto: '', whatsapp: '', email: '', necesidades: '',
   });
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
@@ -31,11 +31,11 @@ export default function ContactForm() {
   const touch  = (k: string) => setTouched(t => ({ ...t, [k]: true }));
 
   const errors: Record<string, string> = {};
-  if (touched.name    && !fields.name.trim())    errors.name    = 'Escribe tu nombre';
+  if (touched.nombre    && !fields.nombre.trim())    errors.nombre    = 'Escribe tu nombre';
   if (touched.email   && !/\S+@\S+\.\S+/.test(fields.email)) errors.email = 'Correo inválido';
-  if (touched.tipo    && !fields.tipo)            errors.tipo    = 'Selecciona un tipo';
+  if (touched.tipoProyecto    && !fields.tipoProyecto)            errors.tipoProyecto    = 'Selecciona un tipo';
 
-  const isValid = fields.name.trim() && fields.email && fields.tipo;
+  const isValid = fields.nombre.trim() && fields.email && fields.tipoProyecto;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,7 +50,7 @@ export default function ContactForm() {
       });
       if (!res.ok) throw new Error('server');
       // Navigate to thank you page with name as query param
-      router.push(`/thank-you?name=${encodeURIComponent(fields.name)}`);
+      router.push(`/thank-you?name=${encodeURIComponent(fields.nombre)}`);
     } catch {
       setState('error');
       setErrorMsg('Ocurrió un problema. Usa el botón de WhatsApp para contactarnos directamente.');
@@ -170,53 +170,53 @@ export default function ContactForm() {
               <form onSubmit={onSubmit} noValidate className="space-y-5">
                 {/* Name */}
                 <div>
-                  <label htmlFor="cf-name" className={labelClass} style={labelStyle}>Nombre completo *</label>
+                  <label htmlFor="cf-nombre" className={labelClass} style={labelStyle}>Nombre completo *</label>
                   <input
-                    id="cf-name"
+                    id="cf-nombre"
                     type="text"
                     autoComplete="name"
                     className={inputClass}
                     placeholder="Tu nombre"
-                    value={fields.name}
-                    onChange={e => update('name', e.target.value)}
-                    onBlur={() => touch('name')}
-                    aria-describedby={errors.name ? 'error-name' : undefined}
-                    aria-invalid={!!errors.name}
+                    value={fields.nombre}
+                    onChange={e => update('nombre', e.target.value)}
+                    onBlur={() => touch('nombre')}
+                    aria-describedby={errors.nombre ? 'error-nombre' : undefined}
+                    aria-invalid={!!errors.nombre}
                   />
-                  {errors.name && <p id="error-name" className="mt-1.5 text-xs" style={{ color: '#f87171' }} role="alert">{errors.name}</p>}
+                  {errors.nombre && <p id="error-nombre" className="mt-1.5 text-xs" style={{ color: '#f87171' }} role="alert">{errors.nombre}</p>}
                 </div>
 
                 {/* Company */}
                 <div>
-                  <label htmlFor="cf-company" className={labelClass} style={labelStyle}>Empresa o proyecto</label>
+                  <label htmlFor="cf-empresa" className={labelClass} style={labelStyle}>Empresa o proyecto</label>
                   <input
-                    id="cf-company"
+                    id="cf-empresa"
                     type="text"
                     autoComplete="organization"
                     className={inputClass}
                     placeholder="Nombre de tu empresa o proyecto"
-                    value={fields.company}
-                    onChange={e => update('company', e.target.value)}
+                    value={fields.empresa}
+                    onChange={e => update('empresa', e.target.value)}
                   />
                 </div>
 
                 {/* Tipo */}
                 <div>
-                  <label htmlFor="cf-tipo" className={labelClass} style={labelStyle}>Tipo de proyecto *</label>
+                  <label htmlFor="cf-tipoProyecto" className={labelClass} style={labelStyle}>Tipo de proyecto *</label>
                   <select
-                    id="cf-tipo"
+                    id="cf-tipoProyecto"
                     className={inputClass}
-                    value={fields.tipo}
-                    onChange={e => update('tipo', e.target.value)}
-                    onBlur={() => touch('tipo')}
-                    aria-describedby={errors.tipo ? 'error-tipo' : undefined}
-                    aria-invalid={!!errors.tipo}
+                    value={fields.tipoProyecto}
+                    onChange={e => update('tipoProyecto', e.target.value)}
+                    onBlur={() => touch('tipoProyecto')}
+                    aria-describedby={errors.tipoProyecto ? 'error-tipoProyecto' : undefined}
+                    aria-invalid={!!errors.tipoProyecto}
                     style={{ cursor: 'pointer' }}
                   >
                     <option value="">Selecciona...</option>
                     {TIPOS.map(t => <option key={t} value={t}>{t}</option>)}
                   </select>
-                  {errors.tipo && <p id="error-tipo" className="mt-1.5 text-xs" style={{ color: '#f87171' }} role="alert">{errors.tipo}</p>}
+                  {errors.tipoProyecto && <p id="error-tipoProyecto" className="mt-1.5 text-xs" style={{ color: '#f87171' }} role="alert">{errors.tipoProyecto}</p>}
                 </div>
 
                 {/* WhatsApp + Email */}
@@ -253,15 +253,15 @@ export default function ContactForm() {
 
                 {/* Message */}
                 <div>
-                  <label htmlFor="cf-message" className={labelClass} style={labelStyle}>¿Qué necesitas mejorar hoy?</label>
+                  <label htmlFor="cf-necesidades" className={labelClass} style={labelStyle}>¿Qué necesitas mejorar hoy?</label>
                   <textarea
-                    id="cf-message"
+                    id="cf-necesidades"
                     rows={4}
                     className={inputClass}
                     style={{ resize: 'vertical', minHeight: '100px' }}
                     placeholder="Describe brevemente tu situación y qué buscas lograr..."
-                    value={fields.message}
-                    onChange={e => update('message', e.target.value)}
+                    value={fields.necesidades}
+                    onChange={e => update('necesidades', e.target.value)}
                   />
                 </div>
 
