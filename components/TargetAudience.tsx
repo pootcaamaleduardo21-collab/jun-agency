@@ -85,14 +85,14 @@ export default function TargetAudience() {
         </div>
 
         <div
-          className="grid grid-cols-1 md:grid-cols-2 gap-px"
+          className="grid grid-cols-1 md:grid-cols-4 gap-px"
           style={{ background: 'rgba(255,255,255,0.07)' }}
         >
           {AUDIENCES.map((a, i) => (
             <div
               key={i}
-              className={`bg-[#0e0e0e] p-8 md:p-10 group hover:bg-white/4 transition-colors duration-300 cursor-default reveal reveal-delay-${Math.min(i + 1, 5)} ${
-                i === 4 ? 'md:col-span-2' : ''
+              className={`bg-[#0e0e0e] p-8 md:p-10 group hover:bg-white/4 transition-colors duration-300 cursor-default reveal reveal-delay-${Math.min(i + 1, 5)} md:col-span-2 ${
+                i === 4 ? 'md:col-start-2' : ''
               }`}
             >
               <div

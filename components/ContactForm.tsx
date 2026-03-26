@@ -1,5 +1,6 @@
 'use client';
 import { useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { useScrollReveal } from './useScrollReveal';
 
 type FormState = 'idle' | 'loading' | 'success' | 'error';
@@ -15,6 +16,7 @@ const TIPOS = [
 ];
 
 export default function ContactForm() {
+  const router = useRouter();
   const sectionRef = useRef<HTMLElement>(null);
   useScrollReveal(sectionRef);
 
@@ -47,9 +49,8 @@ export default function ContactForm() {
         body: JSON.stringify(fields),
       });
       if (!res.ok) throw new Error('server');
-      setState('success');
-      setFields({ name:'',company:'',tipo:'',whatsapp:'',email:'',message:'' });
-      setTouched({});
+      // Navigate to thank you page with name as query param
+      router.push(`/thank-you?name=${encodeURIComponent(fields.name)}`);
     } catch {
       setState('error');
       setErrorMsg('Ocurrió un problema. Usa el botón de WhatsApp para contactarnos directamente.');

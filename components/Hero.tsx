@@ -316,22 +316,6 @@ export default function Hero() {
           </a>
         </div>
 
-        {/* Anchor chips */}
-        <div className="flex flex-wrap items-center gap-6">
-          {[
-            {value:'Real estate',label:'y turismo'},
-            {value:'Playa del Carmen',label:'Riviera Maya'},
-            {value:'Estrategia',label:'y conversión'},
-          ].map((chip) => (
-            <div key={chip.value} className="flex items-center gap-3">
-              <div className="w-px h-6" style={{background:'rgba(212,175,154,0.3)'}} aria-hidden="true" />
-              <div>
-                <div className="text-xs" style={{color:'rgba(255,255,255,0.38)',fontWeight:600,letterSpacing:'0.06em'}}>{chip.label}</div>
-                <div className="text-sm" style={{color:'rgba(212,175,154,0.9)',fontWeight:700}}>{chip.value}</div>
-              </div>
-            </div>
-          ))}
-        </div>
       </div>
 
       {/* Scroll indicator */}
