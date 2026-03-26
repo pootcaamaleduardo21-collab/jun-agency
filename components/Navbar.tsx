@@ -61,14 +61,13 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-6 md:px-12 h-16 flex items-center justify-between">
 
-        {/* Wordmark */}
+        {/* Logo */}
         <a
           href="#"
           aria-label="JUN Agency — Inicio"
-          className="text-xl text-white hover:text-[var(--sand)] transition-colors duration-300"
-          style={{ fontWeight: 700, fontFamily: 'Satoshi, sans-serif', letterSpacing: '0.08em' }}
+          className="flex items-center h-14"
         >
-          JUN
+          <img src="/logo.png" alt="JUN Agency" className="h-14 w-auto" />
         </a>
 
         {/* Desktop nav */}

@@ -45,12 +45,7 @@ export default function Footer() {
 
           {/* Brand */}
           <div className="md:col-span-2">
-            <div
-              className="text-2xl text-white mb-4 tracking-[0.08em]"
-              style={{ fontWeight: 700, fontFamily: 'Satoshi, sans-serif' }}
-            >
-              JUN
-            </div>
+            <img src="/logo.png" alt="JUN Agency" className="h-16 w-auto mb-4" />
             <p className="text-sm text-white/70 leading-relaxed max-w-xs mb-8">
               Agencia de marketing digital especializada en crecimiento,
               estrategia y conversión para real estate y turismo en la Riviera Maya.
