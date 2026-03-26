@@ -34,8 +34,9 @@ export default function ContactForm() {
   if (touched.nombre    && !fields.nombre.trim())    errors.nombre    = 'Escribe tu nombre';
   if (touched.email   && !/\S+@\S+\.\S+/.test(fields.email)) errors.email = 'Correo inválido';
   if (touched.tipoProyecto    && !fields.tipoProyecto)            errors.tipoProyecto    = 'Selecciona un tipo';
+  if (touched.necesidades    && !fields.necesidades.trim())            errors.necesidades    = 'Describe qué necesitas mejorar';
 
-  const isValid = fields.nombre.trim() && fields.email && fields.tipoProyecto;
+  const isValid = fields.nombre.trim() && fields.email && fields.tipoProyecto && fields.necesidades.trim();
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -253,7 +254,7 @@ export default function ContactForm() {
 
                 {/* Message */}
                 <div>
-                  <label htmlFor="cf-necesidades" className={labelClass} style={labelStyle}>¿Qué necesitas mejorar hoy?</label>
+                  <label htmlFor="cf-necesidades" className={labelClass} style={labelStyle}>¿Qué necesitas mejorar hoy? *</label>
                   <textarea
                     id="cf-necesidades"
                     rows={4}
@@ -262,7 +263,11 @@ export default function ContactForm() {
                     placeholder="Describe brevemente tu situación y qué buscas lograr..."
                     value={fields.necesidades}
                     onChange={e => update('necesidades', e.target.value)}
+                    onBlur={() => touch('necesidades')}
+                    aria-describedby={errors.necesidades ? 'error-necesidades' : undefined}
+                    aria-invalid={!!errors.necesidades}
                   />
+                  {errors.necesidades && <p id="error-necesidades" className="mt-1.5 text-xs" style={{ color: '#f87171' }} role="alert">{errors.necesidades}</p>}
                 </div>
 
                 {/* Error */}
