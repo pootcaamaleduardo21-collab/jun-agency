@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import WhatsAppFloat from '@/components/WhatsAppFloat'
@@ -174,9 +175,9 @@ export default function AdsPage() {
                 >
                   Solicitar diagnóstico gratuito
                 </a>
-                <a href="/community-manager" className="cta-secondary">
+                <Link href="/community-manager" className="cta-secondary">
                   Ver Community Manager
-                </a>
+                </Link>
               </div>
             </div>
           </div>

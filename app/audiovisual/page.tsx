@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import WhatsAppFloat from '@/components/WhatsAppFloat'
@@ -217,9 +218,9 @@ export default function AudiovisualPage() {
                 <a href={WA} target="_blank" rel="noopener noreferrer" className="cta-primary">
                   Solicitar cotización
                 </a>
-                <a href="/#servicios" className="cta-secondary">
+                <Link href="/#servicios" className="cta-secondary">
                   Ver todos los servicios
-                </a>
+                </Link>
               </div>
             </div>
           </div>

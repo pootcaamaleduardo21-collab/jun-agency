@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import WhatsAppFloat from '@/components/WhatsAppFloat'
@@ -197,9 +198,9 @@ export default function CommunityManagerPage() {
                 <a href={WA} target="_blank" rel="noopener noreferrer" className="cta-primary">
                   Solicitar información
                 </a>
-                <a href="/ads" className="cta-secondary">
+                <Link href="/ads" className="cta-secondary">
                   Ver servicio de Ads
-                </a>
+                </Link>
               </div>
             </div>
           </div>
@@ -462,9 +463,9 @@ export default function CommunityManagerPage() {
                   <a href={WA} target="_blank" rel="noopener noreferrer" className="cta-primary">
                     Solicitar propuesta por WhatsApp
                   </a>
-                  <a href="/ads" className="cta-secondary">
+                  <Link href="/ads" className="cta-secondary">
                     Ver servicio de Ads
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>
