@@ -11,6 +11,7 @@ import ClosingSection from '@/components/ClosingSection'
 import FAQ from '@/components/FAQ'
 import ContactForm from '@/components/ContactForm'
 import Footer from '@/components/Footer'
+import WhatsAppFloat from '@/components/WhatsAppFloat'
 
 export default function Home() {
   return (
@@ -30,6 +31,7 @@ export default function Home() {
         <ContactForm />
       </main>
       <Footer />
+      <WhatsAppFloat />
     </>
   )
 }

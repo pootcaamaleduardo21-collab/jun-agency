@@ -4,11 +4,14 @@ export default function Footer() {
       <div className="container-max">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 bg-jun-sand rounded-sm flex items-center justify-center">
-                <span className="text-jun-dark font-bold text-lg">JUN</span>
-              </div>
-              <span className="text-lg font-bold text-white">JUN</span>
+            <div className="mb-4">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo.png"
+                alt="JUN"
+                className="h-10 w-auto"
+                style={{ filter: 'invert(1) brightness(1.1)' }}
+              />
             </div>
             <p className="text-sm text-white/60">
               Especialistas en crecimiento digital para real estate y turismo.
@@ -39,7 +42,7 @@ export default function Footer() {
                 href="https://www.facebook.com/profile.php?id=61583690176384"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-white/10 hover:bg-jun-sand hover:text-jun-dark rounded-sm flex items-center justify-center transition"
+                className="w-10 h-10 bg-white/10 hover:bg-jun-sand hover:text-jun-dark rounded-2xl flex items-center justify-center transition"
                 title="Facebook"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -50,7 +53,7 @@ export default function Footer() {
                 href="https://www.instagram.com/junmktmx/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-white/10 hover:bg-jun-sand hover:text-jun-dark rounded-sm flex items-center justify-center transition"
+                className="w-10 h-10 bg-white/10 hover:bg-jun-sand hover:text-jun-dark rounded-2xl flex items-center justify-center transition"
                 title="Instagram"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -61,7 +64,7 @@ export default function Footer() {
                 href="https://www.tiktok.com/@junmktmx"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-white/10 hover:bg-jun-sand hover:text-jun-dark rounded-sm flex items-center justify-center transition"
+                className="w-10 h-10 bg-white/10 hover:bg-jun-sand hover:text-jun-dark rounded-2xl flex items-center justify-center transition"
                 title="TikTok"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">

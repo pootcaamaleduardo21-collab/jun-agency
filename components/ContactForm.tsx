@@ -68,7 +68,7 @@ export default function ContactForm() {
         </h2>
 
         {submitted ? (
-          <div className="p-8 bg-white border-2 border-jun-sand rounded-sm text-center">
+          <div className="p-8 bg-white border-2 border-jun-sand rounded-2xl text-center">
             <h3 className="text-xl font-bold text-jun-black mb-2">
               ¡Gracias por tu interés!
             </h3>
@@ -79,7 +79,7 @@ export default function ContactForm() {
         ) : (
           <form
             onSubmit={handleSubmit}
-            className="bg-white p-8 lg:p-12 rounded-sm border-2 border-jun-sand shadow-lg"
+            className="bg-white p-8 lg:p-12 rounded-2xl border-2 border-jun-sand shadow-lg"
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
@@ -96,7 +96,7 @@ export default function ContactForm() {
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-4 text-base rounded-sm border-2 border-jun-accent/30 focus:outline-none focus:border-jun-sand focus:ring-2 focus:ring-jun-sand/50 transition-all"
+                  className="w-full px-4 py-4 text-base text-jun-black rounded-2xl border-2 border-jun-accent/30 focus:outline-none focus:border-jun-sand focus:ring-2 focus:ring-jun-sand/50 transition-all"
                   placeholder="Tu nombre"
                 />
               </div>
@@ -115,7 +115,7 @@ export default function ContactForm() {
                   value={formData.company}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-4 text-base rounded-sm border-2 border-jun-accent/30 focus:outline-none focus:border-jun-sand focus:ring-2 focus:ring-jun-sand/50 transition-all"
+                  className="w-full px-4 py-4 text-base text-jun-black rounded-2xl border-2 border-jun-accent/30 focus:outline-none focus:border-jun-sand focus:ring-2 focus:ring-jun-sand/50 transition-all"
                   placeholder="Nombre del proyecto"
                 />
               </div>
@@ -135,7 +135,7 @@ export default function ContactForm() {
                   value={formData.projectType}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-4 text-base rounded-sm border-2 border-jun-accent/30 focus:outline-none focus:border-jun-sand focus:ring-2 focus:ring-jun-sand/50 transition-all"
+                  className="w-full px-4 py-4 text-base text-jun-black rounded-2xl border-2 border-jun-accent/30 focus:outline-none focus:border-jun-sand focus:ring-2 focus:ring-jun-sand/50 transition-all"
                 >
                   <option value="">Selecciona una opción</option>
                   <option value="real-estate">Real Estate / Inmobiliario</option>
@@ -161,7 +161,7 @@ export default function ContactForm() {
                   value={formData.whatsapp}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-4 text-base rounded-sm border-2 border-jun-accent/30 focus:outline-none focus:border-jun-sand focus:ring-2 focus:ring-jun-sand/50 transition-all"
+                  className="w-full px-4 py-4 text-base text-jun-black rounded-2xl border-2 border-jun-accent/30 focus:outline-none focus:border-jun-sand focus:ring-2 focus:ring-jun-sand/50 transition-all"
                   placeholder="+52 985 108 9671"
                 />
               </div>
@@ -181,7 +181,7 @@ export default function ContactForm() {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-4 text-base rounded-sm border-2 border-jun-accent/30 focus:outline-none focus:border-jun-sand focus:ring-2 focus:ring-jun-sand/50 transition-all"
+                className="w-full px-4 py-4 text-base text-jun-black rounded-2xl border-2 border-jun-accent/30 focus:outline-none focus:border-jun-sand focus:ring-2 focus:ring-jun-sand/50 transition-all"
                 placeholder="tu@email.com"
               />
             </div>
@@ -200,7 +200,7 @@ export default function ContactForm() {
                 onChange={handleChange}
                 required
                 rows={5}
-                className="w-full px-4 py-4 text-base rounded-sm border-2 border-jun-accent/30 focus:outline-none focus:border-jun-sand focus:ring-2 focus:ring-jun-sand/50 transition-all resize-none"
+                className="w-full px-4 py-4 text-base text-jun-black rounded-2xl border-2 border-jun-accent/30 focus:outline-none focus:border-jun-sand focus:ring-2 focus:ring-jun-sand/50 transition-all resize-none"
                 placeholder="Cuéntanos brevemente qué desafío enfrenta tu proyecto en digital..."
               />
             </div>
@@ -208,7 +208,7 @@ export default function ContactForm() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-jun-black text-white font-bold py-4 px-8 rounded-sm hover:bg-jun-dark transition-all duration-300 text-base disabled:opacity-70 disabled:cursor-not-allowed hover:shadow-lg"
+              className="w-full bg-jun-black text-white font-bold py-4 px-8 rounded-2xl hover:bg-jun-dark transition-all duration-300 text-base disabled:opacity-70 disabled:cursor-not-allowed hover:shadow-lg"
             >
               {loading ? 'Enviando...' : 'Solicitar diagnóstico'}
             </button>
