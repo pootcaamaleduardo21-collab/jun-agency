@@ -67,11 +67,11 @@ export default function ForWho() {
           </p>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-8 max-w-4xl mx-auto">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-8 max-w-4xl mx-auto">
           {categories.map((cat, i) => (
             <div
               key={i}
-              className="group w-[calc(50%-6px)] sm:w-[calc(33.333%-11px)] p-5 sm:p-6 bg-jun-surface border border-jun-border rounded-2xl hover:border-jun-sand/40 hover:shadow-[0_0_20px_rgba(139,92,246,0.08)] transition-all duration-300 animate-fade-in-up"
+              className={`group${i === categories.length - 1 && categories.length % 2 !== 0 ? ' col-span-2 sm:col-span-1' : ''} p-5 sm:p-6 bg-jun-surface border border-jun-border rounded-2xl hover:border-jun-sand/40 hover:shadow-[0_0_20px_rgba(139,92,246,0.08)] transition-all duration-300 animate-fade-in-up`}
               style={{ animationDelay: `${i * 0.08}s` }}
             >
               <div className="text-white/50 mb-3 group-hover:text-jun-sand transition-colors duration-300">

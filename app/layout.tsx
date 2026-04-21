@@ -5,8 +5,8 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://junmkt.com'
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: 'JUN - Estrategia Digital para Real Estate y Turismo | Riviera Maya',
-  description: 'Especialistas en crecimiento digital para real estate, turismo y marcas experienciales en la Riviera Maya. Construimos presencia digital con dirección y conversión.',
+  title: 'JUN - Agencia de Marketing Digital | Riviera Maya',
+  description: 'Estrategia digital, contenido y campañas para proyectos que quieren crecer. Posicionamiento, comunidad y conversión para marcas en la Riviera Maya y más allá.',
   keywords: [
     'agencia de marketing digital',
     'marketing para real estate',
@@ -23,8 +23,8 @@ export const metadata: Metadata = {
     locale: 'es_MX',
     url: siteUrl,
     siteName: 'JUN',
-    title: 'JUN - Estrategia Digital para Real Estate y Turismo | Riviera Maya',
-    description: 'Especialistas en crecimiento digital para real estate, turismo y marcas experienciales en la Riviera Maya. Construimos presencia digital con dirección y conversión.',
+    title: 'JUN - Agencia de Marketing Digital | Riviera Maya',
+    description: 'Estrategia digital, contenido y campañas para proyectos que quieren crecer. Posicionamiento, comunidad y conversión para marcas en la Riviera Maya y más allá.',
     images: [
       {
         url: '/og-image.png',
@@ -36,8 +36,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'JUN - Estrategia Digital para Real Estate y Turismo | Riviera Maya',
-    description: 'Especialistas en crecimiento digital para real estate, turismo y marcas experienciales.',
+    title: 'JUN - Agencia de Marketing Digital | Riviera Maya',
+    description: 'Estrategia digital, contenido y campañas para proyectos que quieren crecer en la Riviera Maya y más allá.',
     images: ['/og-image.png'],
   },
   robots: {
