@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 export default function ForWho() {
   const categories = [
     {
@@ -95,9 +97,9 @@ export default function ForWho() {
             Si tu proyecto necesita comunicar mejor, diferenciarse o convertir con más claridad,
             tenemos algo que contarte.
           </p>
-          <a href="#contacto" className="cta-primary text-sm sm:text-base">
+          <Link href="/cotizar" className="cta-primary text-sm sm:text-base">
             Hablemos de tu proyecto
-          </a>
+          </Link>
         </div>
       </div>
     </section>

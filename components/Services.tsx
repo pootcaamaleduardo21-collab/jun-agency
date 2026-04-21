@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 export default function Services() {
   const services = [
     {
@@ -109,9 +111,9 @@ export default function Services() {
         </div>
 
         <div className="text-center">
-          <a href="#contacto" className="cta-secondary">
+          <Link href="/cotizar" className="cta-secondary">
             Conoce qué necesita tu proyecto
-          </a>
+          </Link>
         </div>
       </div>
     </section>

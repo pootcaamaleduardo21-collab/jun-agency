@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 export default function ClosingSection() {
   return (
     <section className="relative overflow-hidden py-20 sm:py-28 lg:py-36 bg-jun-black">
@@ -44,12 +46,12 @@ export default function ClosingSection() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <a
-            href="#contacto"
+          <Link
+            href="/cotizar"
             className="w-full sm:w-auto cta-primary text-base px-9 py-4"
           >
             Solicita tu diagnóstico estratégico
-          </a>
+          </Link>
           <a
             href="https://wa.me/9851089671?text=Hola%20JUN%2C%20me%20gustaría%20recibir%20más%20detalles%20para%20mi%20negocio"
             target="_blank"

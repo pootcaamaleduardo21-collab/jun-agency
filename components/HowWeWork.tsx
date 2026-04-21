@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 export default function HowWeWork() {
   const steps = [
     {
@@ -120,9 +122,9 @@ export default function HowWeWork() {
         </div>
 
         <div className="text-center mt-8 md:mt-0">
-          <a href="#contacto" className="cta-primary">
+          <Link href="/cotizar" className="cta-primary">
             Solicita tu diagnóstico estratégico
-          </a>
+          </Link>
         </div>
       </div>
     </section>

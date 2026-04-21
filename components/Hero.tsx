@@ -1,5 +1,7 @@
 'use client'
 
+import Link from 'next/link'
+
 const leftWords = [
   { text: 'Estrategia',  delay: '0s',   dur: '6s'   },
   { text: 'Conversión',  delay: '1.8s', dur: '5.5s' },
@@ -128,12 +130,12 @@ export default function Hero() {
             className="flex flex-col sm:flex-row gap-3 justify-center pt-2 animate-fade-in-up"
             style={{ animationDelay: '0.4s' }}
           >
-            <a
-              href="#contacto"
+            <Link
+              href="/cotizar"
               className="w-full sm:w-auto cta-primary text-base px-9 py-4"
             >
               Solicita tu diagnóstico estratégico
-            </a>
+            </Link>
             <a
               href="https://wa.me/9851089671?text=Hola%20JUN%2C%20me%20gustaría%20recibir%20más%20detalles%20para%20mi%20negocio"
               target="_blank"
