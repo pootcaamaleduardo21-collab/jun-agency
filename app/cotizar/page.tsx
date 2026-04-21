@@ -409,13 +409,13 @@ export default function CotizarPage() {
                   className="flex items-center gap-2 text-white/40 text-xs hover:text-white/70 transition mb-1">
                   ← Volver a paquetes
                 </button>
-                <IndividualServices form={form} set={set} isAgent={true} isCompany={false} />
+                <IndividualServices form={form} set={set} isAgent={true} />
               </div>
             )}
 
             {/* ── NON-AGENT: Individual services ── */}
             {!isAgent && (
-              <IndividualServices form={form} set={set} isAgent={false} isCompany={isCompany} />
+              <IndividualServices form={form} set={set} isAgent={false} />
             )}
 
           </div>
@@ -638,11 +638,10 @@ export default function CotizarPage() {
 }
 
 /* ─── Individual services (reusable for agents in custom mode + non-agents) ── */
-function IndividualServices({ form, set, isAgent, isCompany }: {
+function IndividualServices({ form, set, isAgent }: {
   form: QuoteForm
   set: <K extends keyof QuoteForm>(key: K, val: QuoteForm[K]) => void
   isAgent: boolean
-  isCompany: boolean
 }) {
   type ServiceKey = 'cm' | 'posts' | 'reels' | 'ads' | 'produccion' | 'drone' | 'tour360'
   const toggleSvc = (id: ServiceKey) =>
