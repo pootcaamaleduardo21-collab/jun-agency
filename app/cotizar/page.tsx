@@ -710,7 +710,8 @@ export default function CotizarPage() {
         )}
 
         {/* Cart total */}
-        <CartTotal form={form} />
+        {/* Cart total — only for bundle flow (individual services mix monthly + project pricing) */}
+        {form.bundle && <CartTotal form={form} />}
 
         {/* Navigation */}
         <div className="flex items-center gap-3 mt-8">
