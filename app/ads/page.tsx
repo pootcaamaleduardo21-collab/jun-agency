@@ -274,7 +274,7 @@ export default function AdsPage() {
                   Hagamos que tu inversión en publicidad trabaje mejor
                 </h2>
                 <p className="text-white/50 text-sm sm:text-base leading-relaxed mb-8">
-                  Cuéntanos tu objetivo y te preparamos un diagnóstico estratégico sin costo. Sin compromisos, con claridad.
+                  Cuéntanos tu objetivo y plataformas de interés. Preparamos una propuesta de campañas adaptada a tu presupuesto y mercado.
                 </p>
                 <Link href="/cotizar" className="cta-primary">
                   Solicitar cotización

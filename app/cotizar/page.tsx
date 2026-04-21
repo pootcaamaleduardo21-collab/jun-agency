@@ -76,6 +76,14 @@ function toggle<T>(arr: T[], val: T): T[] {
   return arr.includes(val) ? arr.filter(x => x !== val) : [...arr, val]
 }
 
+/* ─── Client-side pricing (cart display) ─────────────────────────────── */
+const BUNDLE_PRICES: Record<string, number> = { esencial: 2500, activo: 4500, pro: 6000 }
+const ADS_PRICES: Partial<Record<AdsPlat, number>> = { meta: 1500, google: 1500, tiktok: 1200 }
+function calcTotal(form: QuoteForm): number {
+  return (BUNDLE_PRICES[form.bundle] || 0) +
+    form.adsPlatforms.reduce((s, p) => s + (ADS_PRICES[p] || 0), 0)
+}
+
 /* ─── PlanCard ───────────────────────────────────────────────────────── */
 function PlanCard({
   selected, onClick, title, badge, badgeColor = 'violet', features,
@@ -147,6 +155,71 @@ function SectionLabel({ icon, title, sub }: { icon: string; title: string; sub?:
   )
 }
 
+/* ─── AdsUpsell (shown after bundle selection in step 1) ─────────────── */
+function AdsUpsell({ form, onToggle }: {
+  form: QuoteForm
+  onToggle: (p: AdsPlat) => void
+}) {
+  const platforms = [
+    { id: 'meta'   as AdsPlat, icon: '📘', label: 'Meta Ads',    sub: 'Facebook + Instagram', price: 1500 },
+    { id: 'google' as AdsPlat, icon: '🔍', label: 'Google Ads',  sub: 'Búsqueda y display',   price: 1500 },
+    { id: 'tiktok' as AdsPlat, icon: '🎵', label: 'TikTok Ads',  sub: 'Tendencias y video',   price: 1200 },
+  ]
+  const anySelected = form.adsPlatforms.length > 0
+  return (
+    <div className={`mt-1 p-4 rounded-2xl border transition-all ${anySelected ? 'border-cyan-500/30 bg-cyan-500/5' : 'border-[#2a2a3a] bg-[#18181f]'}`}>
+      <div className="flex items-start justify-between gap-2 mb-1">
+        <div className="flex items-center gap-2">
+          <span>📣</span>
+          <p className="text-white font-bold text-sm">¿Agregar publicidad digital?</p>
+        </div>
+        <span className="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/25">Muy solicitado</span>
+      </div>
+      <p className="text-white/40 text-xs mb-3 ml-6">Campañas en redes y buscadores · Incluye reporte mensual de resultados</p>
+      <div className="grid grid-cols-3 gap-2">
+        {platforms.map(p => {
+          const sel = form.adsPlatforms.includes(p.id)
+          return (
+            <button key={p.id} type="button" onClick={() => onToggle(p.id)}
+              className={`p-3 rounded-xl border-2 text-left transition-all ${sel ? 'border-cyan-500 bg-cyan-500/10' : 'border-[#2a2a3a] hover:border-cyan-500/30'}`}
+            >
+              <span className="text-lg block mb-1">{p.icon}</span>
+              <p className={`text-xs font-bold ${sel ? 'text-white' : 'text-white/70'}`}>{p.label}</p>
+              <p className="text-white/40 text-[10px]">{p.sub}</p>
+              <p className={`text-xs font-bold mt-1.5 ${sel ? 'text-cyan-300' : 'text-white/40'}`}>+${p.price.toLocaleString('es-MX')}/mes</p>
+            </button>
+          )
+        })}
+      </div>
+      <p className="text-white/25 text-[10px] mt-2">La pauta publicitaria (presupuesto de anuncios) se cotiza aparte</p>
+    </div>
+  )
+}
+
+/* ─── CartTotal ──────────────────────────────────────────────────────── */
+function CartTotal({ form }: { form: QuoteForm }) {
+  const total = calcTotal(form)
+  if (total === 0) return null
+  const b = form.bundle ? AGENT_BUNDLES[form.bundle as BundleKey] : null
+  return (
+    <div className="mt-6 rounded-2xl border border-white/8 bg-white/[0.03] p-4 flex items-center justify-between gap-4">
+      <div className="min-w-0">
+        <p className="text-white/40 text-[10px] uppercase tracking-wide font-semibold mb-1">Tu plan actual</p>
+        <div className="flex flex-wrap gap-x-3 gap-y-0.5">
+          {b && <span className="text-white/60 text-xs">{b.name}</span>}
+          {form.adsPlatforms.map(p => (
+            <span key={p} className="text-cyan-400/70 text-xs capitalize">+ {p} ads</span>
+          ))}
+        </div>
+      </div>
+      <div className="shrink-0 text-right">
+        <p className="text-white font-black text-2xl leading-none">${total.toLocaleString('es-MX')}</p>
+        <p className="text-white/35 text-[10px] mt-0.5">/mes</p>
+      </div>
+    </div>
+  )
+}
+
 /* ─── Main ───────────────────────────────────────────────────────────── */
 export default function CotizarPage() {
   const [step, setStep]         = useState(0)
@@ -179,6 +252,17 @@ export default function CotizarPage() {
   const goCustom = () => {
     setForm(f => ({ ...f, bundle: '', services: [], cmPlan: '', postsPlan: '', reelsPlan: '', adsPlatforms: [], produccionPlan: '' }))
     setShowCustom(true)
+  }
+
+  /* ── Toggle ads platform (atomically updates both adsPlatforms + services) ── */
+  const toggleAdsPlatform = (p: AdsPlat) => {
+    setForm(f => {
+      const newPlats = toggle(f.adsPlatforms, p)
+      const newSvcs = newPlats.length > 0
+        ? (f.services.includes('ads') ? f.services : [...f.services, 'ads' as ServiceKey])
+        : f.services.filter(s => s !== ('ads' as ServiceKey))
+      return { ...f, adsPlatforms: newPlats, services: newSvcs }
+    })
   }
 
   const canProceed = () => {
@@ -338,10 +422,11 @@ export default function CotizarPage() {
                           </div>
                           <p className="text-white/50 text-xs">{b.tagline}</p>
                         </div>
-                        <div className={`shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all mt-0.5 ${
-                          sel ? 'border-violet-500 bg-violet-500' : 'border-white/20'
-                        }`}>
-                          {sel && <span className="text-white text-xs font-bold">✓</span>}
+                        <div className="text-right shrink-0">
+                          <p className={`font-black text-xl leading-none mb-1 ${sel ? 'text-white' : 'text-white/60'}`}>{b.price}</p>
+                          <div className={`ml-auto w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${sel ? 'border-violet-500 bg-violet-500' : 'border-white/20'}`}>
+                            {sel && <span className="text-white text-xs font-bold">✓</span>}
+                          </div>
                         </div>
                       </div>
                       <ul className="flex flex-wrap gap-x-4 gap-y-1 mb-3">
@@ -355,6 +440,9 @@ export default function CotizarPage() {
                     </button>
                   )
                 })}
+
+                {/* Ads upsell — shown when a bundle is selected */}
+                {form.bundle && <AdsUpsell form={form} onToggle={toggleAdsPlatform} />}
 
                 {/* Divider + custom link */}
                 <div className="pt-2">
@@ -503,8 +591,8 @@ export default function CotizarPage() {
               </div>
             )}
 
-            {/* Ads */}
-            {form.services.includes('ads') && (
+            {/* Ads — only for non-bundle flow (bundle users select ads in step 1) */}
+            {!form.bundle && form.services.includes('ads') && (
               <div>
                 <SectionLabel icon="📣" title="Publicidad digital" sub="Elige una o varias plataformas" />
                 <div className="flex flex-wrap gap-3">
@@ -620,6 +708,9 @@ export default function CotizarPage() {
             {error && <p className="text-red-400 text-sm text-center">{error}</p>}
           </div>
         )}
+
+        {/* Cart total */}
+        <CartTotal form={form} />
 
         {/* Navigation */}
         <div className="flex items-center gap-3 mt-8">
