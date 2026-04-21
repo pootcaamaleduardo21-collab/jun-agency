@@ -22,23 +22,47 @@ export default function ValueProposition() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-12">
-          <p className="text-base sm:text-lg leading-relaxed text-white/60 text-center sm:text-left">
-            En JUN unimos estrategia, producción de contenido y ejecución digital para
-            ayudar a proyectos y marcas a posicionarse mejor en un mercado competitivo.
-            No creemos en soluciones genéricas ni en presencia sin propósito.
-          </p>
-          <p className="text-base sm:text-lg leading-relaxed text-white/60 text-center sm:text-left">
-            Cada proyecto merece una presencia digital que comunique con claridad,
-            que genere confianza y que esté diseñada para convertir. Eso es lo que hacemos.
-          </p>
+        {/* Comparison grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12 max-w-3xl mx-auto">
+          {/* Generic agency */}
+          <div className="p-5 rounded-2xl border border-white/8 bg-white/[0.02]">
+            <p className="text-white/30 text-xs font-bold uppercase tracking-widest mb-4">Agencia genérica</p>
+            <ul className="space-y-3">
+              {[
+                'Publica por publicar sin estrategia detrás',
+                'Entrega contenido sin medir su impacto',
+                'Aplica la misma fórmula a todos los clientes',
+                'Reportes que no dicen nada accionable',
+              ].map((item, i) => (
+                <li key={i} className="flex items-start gap-2.5 text-sm text-white/40">
+                  <span className="text-red-400/60 mt-0.5 shrink-0">✕</span>{item}
+                </li>
+              ))}
+            </ul>
+          </div>
+          {/* JUN */}
+          <div className="p-5 rounded-2xl border border-violet-500/25 bg-violet-500/5">
+            <p className="text-jun-sand text-xs font-bold uppercase tracking-widest mb-4">En JUN</p>
+            <ul className="space-y-3">
+              {[
+                'Cada acción responde a un objetivo claro',
+                'Contenido con propósito: comunicar, posicionar y convertir',
+                'Estrategia diseñada para tu mercado específico',
+                'Reporte mensual claro con próximos pasos',
+              ].map((item, i) => (
+                <li key={i} className="flex items-start gap-2.5 text-sm text-white/80">
+                  <span className="text-jun-lime mt-0.5 shrink-0">✓</span>{item}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
         {/* Manifesto quote */}
         <div className="relative p-6 sm:p-8 border border-jun-border rounded-2xl bg-jun-surface/50">
           <div className="text-5xl text-jun-sand/20 font-black leading-none mb-3 select-none">&ldquo;</div>
           <p className="text-center text-lg sm:text-xl font-bold text-white/90 italic">
-            Más que presencia: dirección, percepción y crecimiento digital.
+            No buscamos clientes que quieran solo contenido. Buscamos proyectos que quieran crecer.
           </p>
         </div>
       </div>

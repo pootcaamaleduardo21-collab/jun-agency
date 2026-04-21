@@ -9,7 +9,7 @@ export default function FAQ() {
     {
       question: '¿Trabajan solo con proyectos de la Riviera Maya?',
       answer:
-        'No. Aunque nos especializamos en el mercado de la Riviera Maya y entendemos profundamente sus dinámicas, trabajamos con proyectos de otras regiones que necesitan estrategia digital clara y conversión. Lo importante es que tengas una visión clara y estés dispuesto a invertir en crecer digitalmente de forma inteligente.',
+        'Operamos desde la Riviera Maya y conocemos bien el mercado local: sus temporadas, su competencia y sus dinámicas. El levantamiento de contenido (fotos, video, 360°) lo realizamos principalmente en la zona. Sin embargo, los servicios de diseño de contenido, gestión de redes y campañas digitales no tienen límite geográfico — trabajamos con proyectos en otras ubicaciones que buscan estrategia digital clara y resultados medibles.',
     },
     {
       question: '¿Qué tipo de servicios puede incluir JUN?',

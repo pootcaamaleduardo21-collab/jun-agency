@@ -231,9 +231,9 @@ export default function AudiovisualPage() {
           <div className="container-max">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-0 sm:divide-x sm:divide-jun-border text-center">
               {[
-                { stat: '80%', label: 'de la decisión de compra en real estate ocurre antes de la primera visita física' },
-                { stat: '3×', label: 'más conversiones en proyectos con contenido visual profesional vs sin él' },
-                { stat: '65%', label: 'del cerebro procesa imágenes antes que texto — el contenido visual es el primer mensaje' },
+                { stat: '80%', label: 'de los compradores investigan visualmente un inmueble antes de su primera visita — Fuente: NAR 2024' },
+                { stat: '2×', label: 'más consultas generan los listings con fotografía y video profesional vs los que no lo tienen' },
+                { stat: '68%', label: 'de usuarios en Instagram toman decisiones de compra influenciadas por el contenido visual que consumen' },
               ].map((item, i) => (
                 <div key={i} className="px-4 sm:px-10">
                   <p className="text-4xl sm:text-5xl font-black gradient-text mb-2">{item.stat}</p>

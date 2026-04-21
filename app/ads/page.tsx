@@ -10,14 +10,14 @@ export const metadata = {
 
 /* ─── Targeting hero background ─────────────────────────────────────── */
 const leftChips = [
-  { text: 'CTR 4.2%',   delay: '0s',   dur: '5.5s' },
-  { text: 'CPL ↓ 32%',  delay: '2.7s', dur: '6s'   },
-  { text: 'CPC ↓ 0.42', delay: '1.4s', dur: '5.2s' },
+  { text: 'CTR 3.1%',   delay: '0s',   dur: '5.5s' },
+  { text: 'CPL ↓ 24%',  delay: '2.7s', dur: '6s'   },
+  { text: 'CPC $0.38',  delay: '1.4s', dur: '5.2s' },
 ]
 const rightChips = [
-  { text: 'ROAS 3.8×',  delay: '1.4s', dur: '5s'   },
-  { text: '12K leads',  delay: '0.8s', dur: '4.8s' },
-  { text: 'CTR +1.8%',  delay: '3.0s', dur: '5.7s' },
+  { text: 'ROAS 2.8×',  delay: '1.4s', dur: '5s'   },
+  { text: '+320 leads',  delay: '0.8s', dur: '4.8s' },
+  { text: 'CPM ↓ 18%',  delay: '3.0s', dur: '5.7s' },
 ]
 
 function TargetingHero() {

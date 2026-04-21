@@ -42,9 +42,9 @@ export default function Services() {
         </svg>
       ),
       color: 'from-[#a3e635] to-[#8b5cf6]',
-      title: 'Posicionamiento y comunicación',
-      description: 'Construimos identidad y comunicación estratégica para diferenciarte.',
-      items: ['Mensajes claros', 'Estructura comercial', 'Presencia digital', 'Piezas para reforzar percepción', 'Identidad visual'],
+      title: 'Community management y redes',
+      description: 'Gestionamos tu presencia en redes con voz de marca, continuidad y estrategia orgánica.',
+      items: ['Gestión mensual de redes', 'Calendario editorial estratégico', 'Voz de marca consistente', 'Crecimiento orgánico de comunidad', 'Reportes de rendimiento'],
       link: '/community-manager',
       linkLabel: 'Ver Community Manager →',
     },

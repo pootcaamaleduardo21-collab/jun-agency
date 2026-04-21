@@ -27,20 +27,20 @@ export default function BrandConnection() {
         </p>
 
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white text-center mb-8 leading-tight">
-          Inspirados por una región que exige{' '}
-          <span className="gradient-text">marcas mejor construidas</span>
+          Nacidos en Riviera Maya,{' '}
+          <span className="gradient-text">pensando en tu mercado</span>
         </h2>
 
         <div className="space-y-5 max-w-3xl mx-auto mb-12">
           <p className="text-base sm:text-lg text-white/60 leading-relaxed text-center">
-            Riviera Maya no es solo un destino geográfico. Es un mercado exigente donde conviven
-            proyectos de lujo, inversión real estate, experiencias turísticas y marcas que compiten
-            por atención y percepción. Aquí, la diferencia la hace una presencia digital clara,
-            estratégica y alineada con el valor real del proyecto.
+            Operamos desde la Riviera Maya — lo que nos da un conocimiento real del mercado local,
+            sus temporadas, su competencia y sus dinámicas. El levantamiento de contenido lo hacemos
+            aquí, con conocimiento del terreno.
           </p>
           <p className="text-base sm:text-lg text-white/60 leading-relaxed text-center">
-            Trabajamos desde la comprensión profunda de este mercado: sus dinámicas, sus clientes,
-            sus competencias y las oportunidades únicas que abre el crecimiento digital bien ejecutado.
+            Los servicios de diseño, gestión de redes y campañas digitales no tienen límite geográfico.
+            Trabajamos con proyectos en otras ubicaciones que buscan estrategia digital clara,
+            sin importar desde dónde operan.
           </p>
         </div>
 

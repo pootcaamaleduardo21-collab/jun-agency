@@ -50,7 +50,7 @@ export default function ClosingSection() {
             href="/cotizar"
             className="w-full sm:w-auto cta-primary text-base px-9 py-4"
           >
-            Solicita tu diagnóstico estratégico
+            Construye tu presencia digital ahora
           </Link>
           <a
             href="https://wa.me/9851089671?text=Hola%20JUN%2C%20me%20gustaría%20recibir%20más%20detalles%20para%20mi%20negocio"

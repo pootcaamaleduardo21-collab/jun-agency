@@ -4,8 +4,8 @@ export default function HowWeWork() {
   const steps = [
     {
       number: '01',
-      title: 'Diagnóstico',
-      description: 'Entendemos tu mercado, competencia, objetivos y dónde estás hoy en presencia digital.',
+      title: 'Conocemos tu punto de partida',
+      description: 'Mapeamos tu presencia actual, competencia directa y audiencia real. Establecemos qué tan lejos está tu proyecto de donde debería estar digitalmente.',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -15,8 +15,8 @@ export default function HowWeWork() {
     },
     {
       number: '02',
-      title: 'Dirección estratégica',
-      description: 'Definimos la estrategia clara, los mensajes, el posicionamiento y el roadmap.',
+      title: 'Diseñamos tu dirección',
+      description: 'Construimos una estrategia específica para tu mercado: qué decir, en qué plataformas, con qué tono y con objetivos medibles desde el primer mes.',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -26,8 +26,8 @@ export default function HowWeWork() {
     },
     {
       number: '03',
-      title: 'Producción y lanzamiento',
-      description: 'Creamos contenido, ejecutamos campañas y montamos tu presencia digital alineada.',
+      title: 'Producimos y activamos',
+      description: 'Creamos el contenido, lanzamos las campañas y montamos tu presencia digital. Cada acción tiene un propósito claro — nada es improvisación.',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -37,8 +37,8 @@ export default function HowWeWork() {
     },
     {
       number: '04',
-      title: 'Optimización continua',
-      description: 'Medimos, analizamos y optimizamos para que cada paso avance el crecimiento.',
+      title: 'Reportamos y mejoramos',
+      description: 'Reporte mensual claro: qué se hizo, qué generó resultado y qué optimizamos el siguiente mes. Sin letras chicas, con datos reales.',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -57,7 +57,7 @@ export default function HowWeWork() {
           </p>
           <h2 className="heading-2 text-white mb-4">Cómo trabajamos</h2>
           <p className="text-white/50 text-base sm:text-lg max-w-2xl mx-auto">
-            Una forma clara de trabajar, desde el diagnóstico hasta la ejecución
+            Un proceso diseñado para generar resultados reales, no solo actividad digital
           </p>
         </div>
 
@@ -123,7 +123,7 @@ export default function HowWeWork() {
 
         <div className="text-center mt-8 md:mt-0">
           <Link href="/cotizar" className="cta-primary">
-            Solicita tu diagnóstico estratégico
+            Empieza con tu plan personalizado
           </Link>
         </div>
       </div>

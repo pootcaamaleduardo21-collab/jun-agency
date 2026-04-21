@@ -14,7 +14,7 @@ export default function Footer() {
               />
             </div>
             <p className="text-sm text-white/60">
-              Especialistas en crecimiento digital para real estate y turismo.
+              Estrategia digital, contenido y campañas para proyectos que quieren crecer.
             </p>
           </div>
 
@@ -77,7 +77,7 @@ export default function Footer() {
 
         <div className="border-t border-white/10 pt-8">
           <p className="text-center text-sm text-white/60">
-            &copy; 2026 JUN. Todos los derechos reservados. Especialistas en crecimiento digital para Riviera Maya.
+            &copy; 2026 JUN. Todos los derechos reservados. Estrategia digital con raíces en Riviera Maya.
           </p>
         </div>
       </div>
