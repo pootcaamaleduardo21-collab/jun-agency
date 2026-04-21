@@ -9,7 +9,6 @@ import BrandConnection from '@/components/BrandConnection'
 import ForWho from '@/components/ForWho'
 import ClosingSection from '@/components/ClosingSection'
 import FAQ from '@/components/FAQ'
-import ContactForm from '@/components/ContactForm'
 import Footer from '@/components/Footer'
 import WhatsAppFloat from '@/components/WhatsAppFloat'
 
@@ -28,7 +27,6 @@ export default function Home() {
         <ForWho />
         <ClosingSection />
         <FAQ />
-        <ContactForm />
       </main>
       <Footer />
       <WhatsAppFloat />
