@@ -69,7 +69,6 @@ const BUNDLES_REF = {
 }
 
 type ServiceKey = keyof typeof SERVICES
-type PlanKey<S extends ServiceKey> = keyof typeof SERVICES[S]['plans']
 
 /* ─── Types ──────────────────────────────────────────────────────────── */
 interface QuoteData {
