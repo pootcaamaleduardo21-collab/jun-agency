@@ -2,21 +2,20 @@
 import { useState } from 'react'
 import Link from 'next/link'
 
-/* ─── Types ─────────────────────────────────────────────────────────── */
-type ClientType = 'agente' | 'empresa' | 'otro' | ''
+/* ─── Types ──────────────────────────────────────────────────────────── */
+type ClientType = 'agente' | 'empresa' | 'emprendimiento' | ''
 type ServiceKey = 'cm' | 'posts' | 'reels' | 'ads' | 'produccion' | 'drone' | 'tour360'
 type AdsPlat = 'meta' | 'google' | 'tiktok'
-type ProdItem = 'foto' | 'video'
 
 interface QuoteForm {
   clientType: ClientType
+  bundle: string          // '' = sin paquete, 'presencia' | 'activo' | 'pro'
   services: ServiceKey[]
-  cmRedes: '1-2' | '3' | '4+' | ''
-  cmDMs: 'si' | 'no' | ''
-  postsCount: 'hasta-12' | '13-20' | '21-30' | 'mas-30' | ''
-  reelsCount: '1-4' | '5-8' | '9-12' | 'mas-12' | ''
+  cmPlan: string
+  postsPlan: string
+  reelsPlan: string
   adsPlatforms: AdsPlat[]
-  produccionItems: ProdItem[]
+  produccionPlan: string
   nombre: string
   empresa: string
   whatsapp: string
@@ -25,540 +24,665 @@ interface QuoteForm {
 }
 
 const INITIAL: QuoteForm = {
-  clientType: '',
-  services: [],
-  cmRedes: '', cmDMs: '',
-  postsCount: '', reelsCount: '',
-  adsPlatforms: [], produccionItems: [],
+  clientType: '', bundle: '', services: [],
+  cmPlan: '', postsPlan: '', reelsPlan: '',
+  adsPlatforms: [], produccionPlan: '',
   nombre: '', empresa: '', whatsapp: '', email: '', notas: '',
 }
 
+/* ─── Planes mensuales (para independientes) ─────────────────────────── */
+const AGENT_BUNDLES = {
+  esencial: {
+    name: 'Plan Esencial',
+    tagline: 'Para estar presente sin complicaciones',
+    price: '$2,500/mes',
+    badge: 'Más accesible',
+    badgeColor: 'bg-violet-500/20 text-violet-300 border-violet-500/30',
+    features: ['4 diseños al mes', '2 reels al mes', 'Contenido listo para publicar'],
+    note: '⚠️ No incluye levantamiento de contenido — trabajamos con el material que tú nos proveas (fotos, videos, info).',
+    autoServices: ['posts', 'reels'] as ServiceKey[],
+    autoCmPlan: '', autoPostsPlan: 'starter', autoReelsPlan: 'starter',
+  },
+  activo: {
+    name: 'Plan Activo',
+    tagline: 'Presencia constante con gestión incluida',
+    price: '$4,500/mes',
+    badge: 'Más popular',
+    badgeColor: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
+    features: ['Community Manager básico', '8 diseños al mes', '5 reels al mes', '✓ Incluye sesión de levantamiento mensual'],
+    note: 'Gestión de tu presencia digital sin que tengas que preocuparte por el contenido.',
+    autoServices: ['cm', 'posts', 'reels'] as ServiceKey[],
+    autoCmPlan: 'basico', autoPostsPlan: 'estandar', autoReelsPlan: 'estandar',
+  },
+  pro: {
+    name: 'Plan Pro',
+    tagline: 'Estrategia y gestión completa',
+    price: '$6,000/mes',
+    badge: 'Todo incluido',
+    badgeColor: 'bg-lime-500/20 text-lime-300 border-lime-500/30',
+    features: ['Community Manager Estándar (3 redes + DMs)', '12 diseños al mes', '6 reels al mes', '✓ Levantamiento mensual + estrategia', '✓ Reporte mensual de métricas'],
+    note: 'Tu presencia digital gestionada al 100% — tú solo apruebas el contenido.',
+    autoServices: ['cm', 'posts', 'reels'] as ServiceKey[],
+    autoCmPlan: 'estandar', autoPostsPlan: 'estandar', autoReelsPlan: 'premium',
+  },
+} as const
+
+type BundleKey = keyof typeof AGENT_BUNDLES
+
 const TOTAL_STEPS = 4
 
-/* ─── Small helpers ─────────────────────────────────────────────────── */
-function OptionCard({ selected, onClick, children }: { selected: boolean; onClick: () => void; children: React.ReactNode }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`w-full text-left p-4 rounded-2xl border-2 transition-all duration-200 ${
-        selected
-          ? 'border-[#8b5cf6] bg-[#8b5cf6]/10 text-white'
-          : 'border-[#2a2a3a] bg-[#18181f] text-white/60 hover:border-[#8b5cf6]/40 hover:text-white/80'
-      }`}
-    >
-      {children}
-    </button>
-  )
+/* ─── Helpers ────────────────────────────────────────────────────────── */
+function toggle<T>(arr: T[], val: T): T[] {
+  return arr.includes(val) ? arr.filter(x => x !== val) : [...arr, val]
 }
 
-function ServiceCard({ id, icon, label, desc, selected, onToggle }: {
-  id: ServiceKey; icon: React.ReactNode; label: string; desc: string; selected: boolean; onToggle: () => void
+/* ─── PlanCard ───────────────────────────────────────────────────────── */
+function PlanCard({
+  selected, onClick, title, badge, badgeColor = 'violet', features,
+}: {
+  selected: boolean; onClick: () => void; title: string
+  badge?: string; badgeColor?: 'violet' | 'cyan' | 'lime'; features: string[]
 }) {
+  const badgeStyles = {
+    violet: 'bg-violet-500/20 text-violet-300 border-violet-500/30',
+    cyan:   'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
+    lime:   'bg-lime-500/20 text-lime-300 border-lime-500/30',
+  }
   return (
-    <button
-      type="button"
-      onClick={onToggle}
-      className={`relative flex flex-col gap-3 p-5 rounded-2xl border-2 text-left transition-all duration-200 ${
-        selected
-          ? 'border-[#8b5cf6] bg-[#8b5cf6]/10'
-          : 'border-[#2a2a3a] bg-[#18181f] hover:border-[#8b5cf6]/40'
+    <button type="button" onClick={onClick}
+      className={`w-full text-left p-4 rounded-2xl border-2 transition-all duration-200 ${
+        selected ? 'border-violet-500 bg-violet-500/10' : 'border-[#2a2a3a] bg-[#18181f] hover:border-violet-500/40'
       }`}
     >
-      {selected && (
-        <div className="absolute top-3 right-3 w-5 h-5 rounded-full flex items-center justify-center"
-          style={{ background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)' }}>
-          <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-          </svg>
-        </div>
-      )}
-      <div className={`${selected ? 'text-[#8b5cf6]' : 'text-white/40'} transition-colors`}>{icon}</div>
-      <div>
-        <p className={`font-bold text-sm ${selected ? 'text-white' : 'text-white/70'}`}>{label}</p>
-        <p className="text-xs text-white/40 mt-0.5 leading-relaxed">{desc}</p>
+      <div className="flex items-center justify-between gap-2 mb-3">
+        <p className={`font-bold text-sm ${selected ? 'text-white' : 'text-white/80'}`}>{title}</p>
+        {badge && <span className={`shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full border ${badgeStyles[badgeColor]}`}>{badge}</span>}
       </div>
+      <ul className="space-y-1.5">
+        {features.map((f, i) => (
+          <li key={i} className="flex items-start gap-2 text-xs text-white/55">
+            <span className={`mt-0.5 shrink-0 ${selected ? 'text-violet-400' : 'text-white/25'}`}>✓</span>{f}
+          </li>
+        ))}
+      </ul>
     </button>
   )
 }
 
-/* ─── Main page ─────────────────────────────────────────────────────── */
+/* ─── InfoCard ───────────────────────────────────────────────────────── */
+function InfoCard({ icon, title, features, color = 'violet' }: {
+  icon: string; title: string; features: string[]; color?: 'violet' | 'cyan'
+}) {
+  const s = color === 'violet' ? 'border-violet-500/40 bg-violet-500/5' : 'border-cyan-500/40 bg-cyan-500/5'
+  const c = color === 'violet' ? 'text-violet-400' : 'text-cyan-400'
+  return (
+    <div className={`p-4 rounded-2xl border ${s}`}>
+      <div className="flex items-start gap-3">
+        <span className="text-2xl shrink-0">{icon}</span>
+        <div>
+          <p className="text-white font-bold text-sm mb-2">{title}</p>
+          <ul className="space-y-1.5">
+            {features.map((f, i) => (
+              <li key={i} className="flex items-start gap-2 text-xs text-white/55">
+                <span className={`mt-0.5 shrink-0 ${c}`}>✓</span>{f}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ─── SectionLabel ───────────────────────────────────────────────────── */
+function SectionLabel({ icon, title, sub }: { icon: string; title: string; sub?: string }) {
+  return (
+    <div className="flex items-center gap-3 mb-4">
+      <div className="w-9 h-9 rounded-xl bg-[#1a1a2e] border border-[#2a2a3a] flex items-center justify-center text-base shrink-0">{icon}</div>
+      <div>
+        <p className="text-white font-bold text-sm">{title}</p>
+        {sub && <p className="text-white/40 text-xs">{sub}</p>}
+      </div>
+    </div>
+  )
+}
+
+/* ─── Main ───────────────────────────────────────────────────────────── */
 export default function CotizarPage() {
-  const [step, setStep] = useState(0)
-  const [form, setForm] = useState<QuoteForm>(INITIAL)
-  const [loading, setLoading] = useState(false)
+  const [step, setStep]         = useState(0)
+  const [form, setForm]         = useState<QuoteForm>(INITIAL)
+  const [loading, setLoading]   = useState(false)
   const [submitted, setSubmitted] = useState(false)
-  const [err, setErr] = useState('')
+  const [error, setError]       = useState('')
+  const [showCustom, setShowCustom] = useState(false) // for agents: show individual services
 
-  const set = (key: keyof QuoteForm, val: unknown) =>
-    setForm(prev => ({ ...prev, [key]: val }))
+  const set = <K extends keyof QuoteForm>(key: K, val: QuoteForm[K]) =>
+    setForm(f => ({ ...f, [key]: val }))
 
-  const toggleService = (s: ServiceKey) =>
-    set('services', form.services.includes(s) ? form.services.filter(x => x !== s) : [...form.services, s])
+  /* ── Apply bundle: auto-fill services and plans ── */
+  const applyBundle = (key: BundleKey) => {
+    const b = AGENT_BUNDLES[key]
+    setForm(f => ({
+      ...f,
+      bundle: key,
+      services: [...b.autoServices],
+      cmPlan: b.autoCmPlan,
+      postsPlan: b.autoPostsPlan,
+      reelsPlan: b.autoReelsPlan,
+      adsPlatforms: [],
+      produccionPlan: '',
+    }))
+    setShowCustom(false)
+  }
 
-  const toggleArr = <T extends string>(arr: T[], val: T): T[] =>
-    arr.includes(val) ? arr.filter(x => x !== val) : [...arr, val]
+  /* ── Clear bundle and go individual ── */
+  const goCustom = () => {
+    setForm(f => ({ ...f, bundle: '', services: [], cmPlan: '', postsPlan: '', reelsPlan: '', adsPlatforms: [], produccionPlan: '' }))
+    setShowCustom(true)
+  }
 
-  /* Validation per step */
   const canProceed = () => {
     if (step === 0) return form.clientType !== ''
-    if (step === 1) return form.services.length > 0
+    if (step === 1) {
+      if (form.clientType === 'agente') {
+        // Either a bundle selected, OR custom services with at least one
+        return form.bundle !== '' || form.services.length > 0
+      }
+      return form.services.length > 0
+    }
     if (step === 2) {
-      if (form.services.includes('cm') && !form.cmRedes) return false
-      if (form.services.includes('posts') && !form.postsCount) return false
-      if (form.services.includes('reels') && !form.reelsCount) return false
-      if (form.services.includes('ads') && form.adsPlatforms.length === 0) return false
-      if ((form.services.includes('produccion')) && form.produccionItems.length === 0) return false
+      // If bundle: only need to validate project services
+      if (form.bundle) return true
+      const s = form.services
+      if (s.includes('cm')         && !form.cmPlan)                   return false
+      if (s.includes('posts')      && !form.postsPlan)                return false
+      if (s.includes('reels')      && !form.reelsPlan)                return false
+      if (s.includes('ads')        && form.adsPlatforms.length === 0) return false
+      if (s.includes('produccion') && !form.produccionPlan)           return false
       return true
     }
-    if (step === 3) return !!(form.nombre && form.empresa && form.whatsapp && form.email)
+    if (step === 3) return !!(form.nombre && form.whatsapp && form.email)
     return true
   }
 
-  const handleSubmit = async () => {
-    setLoading(true)
-    setErr('')
+  const submit = async () => {
+    setLoading(true); setError('')
     try {
       const res = await fetch('/api/quote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       })
-      if (res.ok) setSubmitted(true)
-      else setErr('Hubo un error. Por favor intenta de nuevo o escríbenos por WhatsApp.')
+      if (!res.ok) throw new Error()
+      setSubmitted(true)
     } catch {
-      setErr('Hubo un error de conexión. Por favor intenta de nuevo.')
+      setError('Hubo un problema al enviar. Intenta de nuevo o escríbenos por WhatsApp.')
     } finally {
       setLoading(false)
     }
   }
 
-  /* ── Progress bar ── */
-  const progress = ((step) / (TOTAL_STEPS - 1)) * 100
+  const isAgent   = form.clientType === 'agente'
+  const isCompany = form.clientType === 'empresa'
 
-  if (submitted) return <SuccessScreen nombre={form.nombre} />
-
-  return (
-    <div className="min-h-screen bg-[#09090b] flex flex-col">
-      {/* Top bar */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-[#09090b]/90 backdrop-blur-md border-b border-white/5">
-        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="JUN" className="h-9 w-auto" style={{ filter: 'invert(1) brightness(1.1)' }} />
-          <span className="text-xs text-white/35 font-medium tracking-wider uppercase">
-            Solicitud de cotización
-          </span>
-        </div>
-        {/* Progress bar */}
-        <div className="h-0.5 bg-white/5">
-          <div
-            className="h-full transition-all duration-500"
-            style={{ width: `${progress}%`, background: 'linear-gradient(90deg, #8b5cf6, #06b6d4)' }}
-          />
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 flex items-center justify-center px-4 pt-28 pb-16">
-        <div className="w-full max-w-2xl">
-
-          {/* Step label */}
-          <p className="text-xs font-semibold tracking-widest uppercase text-white/30 mb-6 text-center">
-            Paso {step + 1} de {TOTAL_STEPS}
+  /* ── Success ── */
+  if (submitted) {
+    return (
+      <div className="min-h-screen bg-[#09090b] flex items-center justify-center px-4 py-24">
+        <div className="max-w-md w-full text-center">
+          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center mx-auto mb-6 text-4xl">🎯</div>
+          <h1 className="text-2xl font-black text-white mb-3">¡Listo, {form.nombre.split(' ')[0]}!</h1>
+          <p className="text-white/60 text-sm leading-relaxed mb-2">
+            Recibimos tu solicitud. Vamos a preparar una <strong className="text-white">propuesta personalizada en PDF</strong> con los servicios que elegiste.
           </p>
-
-          {/* ── STEP 0: Tipo de cliente ── */}
-          {step === 0 && (
-            <div className="animate-fade-in-up">
-              <h1 className="text-2xl sm:text-3xl font-black text-white text-center mb-2">
-                ¿Cómo describes tu proyecto?
-              </h1>
-              <p className="text-white/45 text-center mb-8 text-sm sm:text-base">
-                Esto nos ayuda a entender mejor lo que necesitas
-              </p>
-              <div className="space-y-3">
-                {[
-                  { val: 'agente' as ClientType, label: 'Soy agente o asesor inmobiliario', desc: 'Quiero promocionar mis propiedades y crecer mi presencia digital' },
-                  { val: 'empresa' as ClientType, label: 'Represento una empresa o marca', desc: 'Hotel, restaurante, desarrolladora, marca o negocio establecido' },
-                  { val: 'otro' as ClientType, label: 'Tengo un negocio o emprendimiento', desc: 'Tienda, servicio, consultora u otro tipo de proyecto' },
-                ].map(opt => (
-                  <OptionCard key={opt.val} selected={form.clientType === opt.val} onClick={() => set('clientType', opt.val)}>
-                    <p className="font-bold text-sm mb-0.5">{opt.label}</p>
-                    <p className="text-xs text-white/40">{opt.desc}</p>
-                  </OptionCard>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* ── STEP 1: Servicios ── */}
-          {step === 1 && (
-            <div className="animate-fade-in-up">
-              <h1 className="text-2xl sm:text-3xl font-black text-white text-center mb-2">
-                ¿Qué servicios necesitas?
-              </h1>
-              <p className="text-white/45 text-center mb-8 text-sm sm:text-base">
-                Puedes seleccionar más de uno
-              </p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {[
-                  {
-                    id: 'cm' as ServiceKey, label: 'Community Manager',
-                    desc: 'Gestión de cuentas y comunidad',
-                    icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                  },
-                  {
-                    id: 'posts' as ServiceKey, label: 'Diseño de posts',
-                    desc: 'Piezas estáticas para feed',
-                    icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                  },
-                  {
-                    id: 'reels' as ServiceKey, label: 'Reels y video',
-                    desc: 'Contenido en movimiento',
-                    icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.069A1 1 0 0121 8.87v6.26a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
-                  },
-                  {
-                    id: 'ads' as ServiceKey, label: 'Publicidad digital',
-                    desc: 'Meta, Google o TikTok Ads',
-                    icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" /></svg>
-                  },
-                  {
-                    id: 'produccion' as ServiceKey, label: 'Foto y video',
-                    desc: 'Sesión profesional en tierra',
-                    icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                  },
-                  {
-                    id: 'drone' as ServiceKey, label: 'Tomas con drone',
-                    desc: 'Foto y video aéreo',
-                    icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
-                  },
-                  {
-                    id: 'tour360' as ServiceKey, label: 'Recorrido 360°',
-                    desc: 'Tour virtual interactivo',
-                    icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
-                  },
-                ].map(svc => (
-                  <ServiceCard
-                    key={svc.id}
-                    id={svc.id}
-                    icon={svc.icon}
-                    label={svc.label}
-                    desc={svc.desc}
-                    selected={form.services.includes(svc.id)}
-                    onToggle={() => toggleService(svc.id)}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* ── STEP 2: Detalles ── */}
-          {step === 2 && (
-            <div className="animate-fade-in-up space-y-8">
-              <div className="text-center">
-                <h1 className="text-2xl sm:text-3xl font-black text-white mb-2">Cuéntanos un poco más</h1>
-                <p className="text-white/45 text-sm sm:text-base">Esto nos ayuda a preparar una propuesta precisa</p>
-              </div>
-
-              {/* CM */}
-              {form.services.includes('cm') && (
-                <DetailSection title="Community Manager" color="#8b5cf6">
-                  <p className="text-xs text-white/40 mb-3">¿En cuántas redes sociales necesitas gestión?</p>
-                  <div className="space-y-2">
-                    {[
-                      { val: '1-2', label: '1 o 2 redes', sub: 'Instagram + Facebook' },
-                      { val: '3', label: '3 redes', sub: 'IG + FB + TikTok' },
-                      { val: '4+', label: '4 o más redes', sub: 'Incluye LinkedIn u otras' },
-                    ].map(o => (
-                      <OptionCard key={o.val} selected={form.cmRedes === o.val} onClick={() => set('cmRedes', o.val)}>
-                        <span className="font-semibold text-sm">{o.label}</span>
-                        <span className="text-xs text-white/40 ml-2">{o.sub}</span>
-                      </OptionCard>
-                    ))}
-                  </div>
-                  <p className="text-xs text-white/40 mt-4 mb-3">¿Incluye respuesta a mensajes directos (DMs)?</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {[{ val: 'si', label: 'Sí, inclúyelo' }, { val: 'no', label: 'Solo comentarios' }].map(o => (
-                      <OptionCard key={o.val} selected={form.cmDMs === o.val} onClick={() => set('cmDMs', o.val)}>
-                        <span className="font-semibold text-sm">{o.label}</span>
-                      </OptionCard>
-                    ))}
-                  </div>
-                </DetailSection>
-              )}
-
-              {/* Posts */}
-              {form.services.includes('posts') && (
-                <DetailSection title="Diseño de posts" color="#06b6d4">
-                  <p className="text-xs text-white/40 mb-3">¿Cuántos posts estáticos al mes necesitas aproximadamente?</p>
-                  <div className="space-y-2">
-                    {[
-                      { val: 'hasta-12', label: 'Hasta 12 posts', sub: '~3 por semana' },
-                      { val: '13-20', label: '13 a 20 posts', sub: '~4-5 por semana' },
-                      { val: '21-30', label: '21 a 30 posts', sub: '~1 diario' },
-                      { val: 'mas-30', label: 'Más de 30', sub: 'Volumen alto' },
-                    ].map(o => (
-                      <OptionCard key={o.val} selected={form.postsCount === o.val} onClick={() => set('postsCount', o.val)}>
-                        <span className="font-semibold text-sm">{o.label}</span>
-                        <span className="text-xs text-white/40 ml-2">{o.sub}</span>
-                      </OptionCard>
-                    ))}
-                  </div>
-                </DetailSection>
-              )}
-
-              {/* Reels */}
-              {form.services.includes('reels') && (
-                <DetailSection title="Reels y video" color="#a3e635">
-                  <p className="text-xs text-white/40 mb-3">¿Cuántos reels o videos al mes?</p>
-                  <div className="space-y-2">
-                    {[
-                      { val: '1-4', label: '1 a 4 reels', sub: '1 por semana' },
-                      { val: '5-8', label: '5 a 8 reels', sub: '2 por semana' },
-                      { val: '9-12', label: '9 a 12 reels', sub: '3 por semana' },
-                      { val: 'mas-12', label: 'Más de 12', sub: 'Producción constante' },
-                    ].map(o => (
-                      <OptionCard key={o.val} selected={form.reelsCount === o.val} onClick={() => set('reelsCount', o.val)}>
-                        <span className="font-semibold text-sm">{o.label}</span>
-                        <span className="text-xs text-white/40 ml-2">{o.sub}</span>
-                      </OptionCard>
-                    ))}
-                  </div>
-                </DetailSection>
-              )}
-
-              {/* Ads */}
-              {form.services.includes('ads') && (
-                <DetailSection title="Publicidad digital" color="#8b5cf6">
-                  <p className="text-xs text-white/40 mb-3">¿En qué plataformas? (puedes seleccionar varias)</p>
-                  <div className="space-y-2">
-                    {[
-                      { val: 'meta' as AdsPlat, label: 'Meta Ads', sub: 'Facebook e Instagram' },
-                      { val: 'google' as AdsPlat, label: 'Google Ads', sub: 'Search, Display y YouTube' },
-                      { val: 'tiktok' as AdsPlat, label: 'TikTok Ads', sub: 'TikTok for Business' },
-                    ].map(o => (
-                      <OptionCard
-                        key={o.val}
-                        selected={form.adsPlatforms.includes(o.val)}
-                        onClick={() => set('adsPlatforms', toggleArr(form.adsPlatforms, o.val))}
-                      >
-                        <span className="font-semibold text-sm">{o.label}</span>
-                        <span className="text-xs text-white/40 ml-2">{o.sub}</span>
-                      </OptionCard>
-                    ))}
-                  </div>
-                  <p className="text-[11px] text-white/30 mt-3 leading-relaxed">
-                    * El presupuesto de pauta (lo que se le paga a Meta/Google/TikTok) va aparte y lo defines tú.
-                  </p>
-                </DetailSection>
-              )}
-
-              {/* Producción terrestre */}
-              {form.services.includes('produccion') && (
-                <DetailSection title="Fotografía y video profesional" color="#06b6d4">
-                  <p className="text-xs text-white/40 mb-3">¿Qué tipo de producción necesitas? (puedes elegir ambas)</p>
-                  <div className="space-y-2">
-                    {[
-                      { val: 'foto' as ProdItem, label: 'Fotografía', sub: 'Fotos profesionales de espacios, propiedades o producto' },
-                      { val: 'video' as ProdItem, label: 'Video / Reel', sub: 'Video promocional o contenido para redes' },
-                    ].map(o => (
-                      <OptionCard
-                        key={o.val}
-                        selected={form.produccionItems.includes(o.val)}
-                        onClick={() => set('produccionItems', toggleArr(form.produccionItems, o.val))}
-                      >
-                        <span className="font-semibold text-sm">{o.label}</span>
-                        <span className="text-xs text-white/40 ml-2">{o.sub}</span>
-                      </OptionCard>
-                    ))}
-                  </div>
-                </DetailSection>
-              )}
-
-              {/* Drone */}
-              {form.services.includes('drone') && (
-                <DetailSection title="Tomas con drone" color="#a3e635">
-                  <p className="text-sm text-white/60 leading-relaxed">
-                    Capturamos tomas aéreas en foto y video 4K. El costo varía según la duración del vuelo y la ubicación. Te prepararemos una cotización específica.
-                  </p>
-                </DetailSection>
-              )}
-
-              {/* 360° */}
-              {form.services.includes('tour360') && (
-                <DetailSection title="Recorrido virtual 360°" color="#8b5cf6">
-                  <p className="text-sm text-white/60 leading-relaxed">
-                    Tour interactivo embebible en tu sitio web. El costo depende del tamaño del espacio y número de puntos de captura. Te cotizamos en detalle.
-                  </p>
-                </DetailSection>
-              )}
-            </div>
-          )}
-
-          {/* ── STEP 3: Datos de contacto ── */}
-          {step === 3 && (
-            <div className="animate-fade-in-up">
-              <h1 className="text-2xl sm:text-3xl font-black text-white text-center mb-2">Tus datos de contacto</h1>
-              <p className="text-white/45 text-center mb-8 text-sm sm:text-base">
-                Te enviamos la propuesta directamente
-              </p>
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Nombre *</label>
-                    <input
-                      type="text"
-                      value={form.nombre}
-                      onChange={e => set('nombre', e.target.value)}
-                      placeholder="Tu nombre"
-                      className="w-full px-4 py-3 rounded-2xl bg-[#18181f] border border-[#2a2a3a] text-white placeholder-white/25 text-sm focus:outline-none focus:border-[#8b5cf6] transition-colors"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Empresa o proyecto *</label>
-                    <input
-                      type="text"
-                      value={form.empresa}
-                      onChange={e => set('empresa', e.target.value)}
-                      placeholder="Nombre del proyecto"
-                      className="w-full px-4 py-3 rounded-2xl bg-[#18181f] border border-[#2a2a3a] text-white placeholder-white/25 text-sm focus:outline-none focus:border-[#8b5cf6] transition-colors"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">WhatsApp *</label>
-                    <input
-                      type="tel"
-                      value={form.whatsapp}
-                      onChange={e => set('whatsapp', e.target.value)}
-                      placeholder="+52 984 000 0000"
-                      className="w-full px-4 py-3 rounded-2xl bg-[#18181f] border border-[#2a2a3a] text-white placeholder-white/25 text-sm focus:outline-none focus:border-[#8b5cf6] transition-colors"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Correo electrónico *</label>
-                    <input
-                      type="email"
-                      value={form.email}
-                      onChange={e => set('email', e.target.value)}
-                      placeholder="tu@email.com"
-                      className="w-full px-4 py-3 rounded-2xl bg-[#18181f] border border-[#2a2a3a] text-white placeholder-white/25 text-sm focus:outline-none focus:border-[#8b5cf6] transition-colors"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">¿Algo más que quieras contarnos? <span className="text-white/25 normal-case font-normal">(opcional)</span></label>
-                  <textarea
-                    value={form.notas}
-                    onChange={e => set('notas', e.target.value)}
-                    placeholder="Cuéntanos sobre tu proyecto, tus objetivos o cualquier detalle que consideres importante..."
-                    rows={4}
-                    className="w-full px-4 py-3 rounded-2xl bg-[#18181f] border border-[#2a2a3a] text-white placeholder-white/25 text-sm focus:outline-none focus:border-[#8b5cf6] transition-colors resize-none"
-                  />
-                </div>
-
-                {err && <p className="text-red-400 text-sm text-center">{err}</p>}
-              </div>
-            </div>
-          )}
-
-          {/* ── Navigation ── */}
-          <div className={`mt-8 flex gap-3 ${step === 0 ? 'justify-center' : 'justify-between'}`}>
-            {step > 0 && (
-              <button
-                onClick={() => setStep(s => s - 1)}
-                className="px-6 py-3 rounded-2xl border border-[#2a2a3a] text-white/60 text-sm font-semibold hover:border-white/20 hover:text-white transition-all"
-              >
-                ← Atrás
-              </button>
-            )}
-            {step < TOTAL_STEPS - 1 ? (
-              <button
-                onClick={() => canProceed() && setStep(s => s + 1)}
-                disabled={!canProceed()}
-                className={`px-8 py-3 rounded-2xl text-white text-sm font-bold transition-all ${
-                  canProceed()
-                    ? 'opacity-100 hover:shadow-[0_0_20px_rgba(139,92,246,0.3)] hover:-translate-y-0.5'
-                    : 'opacity-30 cursor-not-allowed'
-                }`}
-                style={{ background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)' }}
-              >
-                Continuar →
-              </button>
-            ) : (
-              <button
-                onClick={() => canProceed() && handleSubmit()}
-                disabled={!canProceed() || loading}
-                className={`flex-1 sm:flex-none px-10 py-3 rounded-2xl text-white text-sm font-bold transition-all ${
-                  canProceed() && !loading
-                    ? 'opacity-100 hover:shadow-[0_0_20px_rgba(139,92,246,0.3)] hover:-translate-y-0.5'
-                    : 'opacity-40 cursor-not-allowed'
-                }`}
-                style={{ background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)' }}
-              >
-                {loading ? 'Enviando...' : 'Enviar solicitud'}
-              </button>
-            )}
+          <p className="text-white/40 text-sm leading-relaxed mb-8">
+            Te contactamos en <strong className="text-white/60">menos de 24 horas</strong> por WhatsApp o correo.
+          </p>
+          <a href="https://wa.me/529851089671?text=Hola%2C%20acabo%20de%20enviar%20una%20solicitud%20de%20cotizaci%C3%B3n"
+            target="_blank" rel="noopener noreferrer"
+            className="inline-block px-6 py-3 rounded-2xl bg-gradient-to-r from-violet-500 to-cyan-500 text-white font-bold text-sm mb-5">
+            Escribirnos por WhatsApp →
+          </a>
+          <div>
+            <Link href="/" className="text-white/30 text-sm hover:text-white/60 transition">← Volver al inicio</Link>
           </div>
+        </div>
+      </div>
+    )
+  }
 
-          {/* Legal note on last step */}
-          {step === TOTAL_STEPS - 1 && (
-            <p className="text-center text-white/25 text-xs mt-4">
-              Al enviar confirmas que deseas recibir una propuesta de JUN. Sin compromisos.
-            </p>
-          )}
+  const stepTitles = [
+    { title: '¿Cómo trabajas?',      sub: 'Esto nos ayuda a personalizar tu propuesta' },
+    { title: '¿Qué necesitas?',      sub: isAgent ? 'Elige un plan mensual o personaliza tus servicios' : 'Elige uno o varios servicios — se pueden combinar' },
+    { title: 'Personaliza tu plan',  sub: 'Adapta cada servicio a lo que realmente necesitas' },
+    { title: 'Tus datos',            sub: 'Para enviarte la propuesta personalizada en PDF' },
+  ]
+
+  return (
+    <div className="min-h-screen bg-[#09090b]">
+
+      {/* Top bar */}
+      <div className="border-b border-white/5 px-4 py-4">
+        <div className="max-w-xl mx-auto flex items-center justify-between">
+          <Link href="/" className="text-white font-black text-xl tracking-tight">jún</Link>
+          <span className="text-white/30 text-xs">Paso {step + 1} de {TOTAL_STEPS}</span>
         </div>
       </div>
 
-      {/* Footer minimal */}
-      <div className="border-t border-white/5 py-4 text-center">
-        <p className="text-white/20 text-xs">© {new Date().getFullYear()} JUN · <Link href="/" className="hover:text-white/40 transition-colors">junmkt.com</Link></p>
+      {/* Progress bar */}
+      <div className="h-0.5 bg-white/5">
+        <div className="h-full bg-gradient-to-r from-violet-500 to-cyan-500 transition-all duration-500"
+          style={{ width: `${((step + 1) / TOTAL_STEPS) * 100}%` }} />
+      </div>
+
+      <div className="max-w-xl mx-auto px-4 py-10">
+
+        {/* Step title */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-black text-white mb-1">{stepTitles[step].title}</h1>
+          <p className="text-white/50 text-sm">{stepTitles[step].sub}</p>
+        </div>
+
+        {/* ══ STEP 0: Perfil ══ */}
+        {step === 0 && (
+          <div className="space-y-3">
+            {([
+              { id: 'agente'        as ClientType, icon: '🧑', title: 'Soy profesional independiente',    sub: 'Consultor, agente, freelance o asesor que trabaja por su cuenta' },
+              { id: 'empresa'       as ClientType, icon: '🏢', title: 'Empresa o marca',         sub: 'Empresa establecida con equipo y proyectos en curso' },
+              { id: 'emprendimiento'as ClientType, icon: '🚀', title: 'Negocio o emprendimiento',sub: 'Proyecto nuevo o marca personal que quiero hacer crecer' },
+            ] as const).map(opt => (
+              <button key={opt.id} type="button" onClick={() => { set('clientType', opt.id); setShowCustom(false) }}
+                className={`w-full text-left p-5 rounded-2xl border-2 transition-all duration-200 flex items-center gap-4 ${
+                  form.clientType === opt.id ? 'border-violet-500 bg-violet-500/10' : 'border-[#2a2a3a] bg-[#18181f] hover:border-violet-500/30'
+                }`}
+              >
+                <span className="text-2xl shrink-0">{opt.icon}</span>
+                <div className="flex-1">
+                  <p className="font-bold text-white text-sm">{opt.title}</p>
+                  <p className="text-white/50 text-xs mt-0.5">{opt.sub}</p>
+                </div>
+                <div className={`shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                  form.clientType === opt.id ? 'border-violet-500 bg-violet-500' : 'border-white/20'
+                }`}>
+                  {form.clientType === opt.id && <span className="text-white text-xs font-bold">✓</span>}
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* ══ STEP 1: Servicios ══ */}
+        {step === 1 && (
+          <div className="space-y-6">
+
+            {/* ── AGENT: Bundle cards ── */}
+            {isAgent && !showCustom && (
+              <div className="space-y-3">
+                <p className="text-white/40 text-xs uppercase tracking-wide font-semibold">Planes mensuales</p>
+                {(Object.entries(AGENT_BUNDLES) as [BundleKey, typeof AGENT_BUNDLES[BundleKey]][]).map(([key, b]) => {
+                  const sel = form.bundle === key
+                  return (
+                    <button key={key} type="button" onClick={() => applyBundle(key)}
+                      className={`w-full text-left p-5 rounded-2xl border-2 transition-all duration-200 ${
+                        sel ? 'border-violet-500 bg-violet-500/10' : 'border-[#2a2a3a] bg-[#18181f] hover:border-violet-500/30'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <div>
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <p className="font-black text-white text-base">{b.name}</p>
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${b.badgeColor}`}>{b.badge}</span>
+                          </div>
+                          <p className="text-white/50 text-xs">{b.tagline}</p>
+                        </div>
+                        <div className={`shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all mt-0.5 ${
+                          sel ? 'border-violet-500 bg-violet-500' : 'border-white/20'
+                        }`}>
+                          {sel && <span className="text-white text-xs font-bold">✓</span>}
+                        </div>
+                      </div>
+                      <ul className="flex flex-wrap gap-x-4 gap-y-1 mb-3">
+                        {b.features.map((f, i) => (
+                          <li key={i} className="flex items-center gap-1.5 text-xs text-white/60">
+                            <span className={sel ? 'text-violet-400' : 'text-white/25'}>✓</span>{f}
+                          </li>
+                        ))}
+                      </ul>
+                      <p className={`text-xs mt-1 ${b.note.startsWith('⚠️') ? 'text-yellow-400/70' : 'text-white/40'}`}>{b.note}</p>
+                    </button>
+                  )
+                })}
+
+                {/* Divider + custom link */}
+                <div className="pt-2">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="flex-1 h-px bg-white/5" />
+                    <p className="text-white/30 text-xs shrink-0">¿Necesitas algo diferente?</p>
+                    <div className="flex-1 h-px bg-white/5" />
+                  </div>
+
+                  {/* Project services (always available for agents too) */}
+                  <div className="space-y-2">
+                    {([
+                      { id: 'produccion'as ServiceKey, icon: '📷', title: 'Foto y video profesional', sub: 'Sesión de alta calidad — por proyecto' },
+                      { id: 'drone'     as ServiceKey, icon: '🚁', title: 'Tomas con drone',           sub: 'Fotografía y video aéreo — por proyecto' },
+                      { id: 'tour360'   as ServiceKey, icon: '🔵', title: 'Recorrido virtual 360°',   sub: 'Tour interactivo navegable — por proyecto' },
+                    ] as const).map(svc => {
+                      const sel = form.services.includes(svc.id)
+                      return (
+                        <button key={svc.id} type="button"
+                          onClick={() => set('services', toggle(form.services, svc.id))}
+                          className={`w-full text-left p-4 rounded-2xl border-2 transition-all flex items-center gap-4 ${
+                            sel ? 'border-violet-500 bg-violet-500/10' : 'border-[#2a2a3a] bg-[#18181f] hover:border-violet-500/30'
+                          }`}
+                        >
+                          <span className="text-xl shrink-0">{svc.icon}</span>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <p className="font-bold text-white text-sm">{svc.title}</p>
+                              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/25">Por proyecto</span>
+                            </div>
+                            <p className="text-white/50 text-xs mt-0.5">{svc.sub}</p>
+                          </div>
+                          <div className={`shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                            sel ? 'border-violet-500 bg-violet-500' : 'border-white/20'
+                          }`}>
+                            {sel && <span className="text-white text-xs font-bold">✓</span>}
+                          </div>
+                        </button>
+                      )
+                    })}
+                  </div>
+
+                  <button onClick={goCustom}
+                    className="w-full mt-3 py-3 rounded-2xl border border-dashed border-white/15 text-white/40 text-sm hover:text-white/70 hover:border-white/25 transition">
+                    Personalizar servicios individuales →
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ── AGENT: Custom individual services (after clicking "Personalizar") ── */}
+            {isAgent && showCustom && (
+              <div className="space-y-3">
+                <button onClick={() => { setShowCustom(false); goCustom() }}
+                  className="flex items-center gap-2 text-white/40 text-xs hover:text-white/70 transition mb-1">
+                  ← Volver a paquetes
+                </button>
+                <IndividualServices form={form} set={set} isAgent={true} isCompany={false} />
+              </div>
+            )}
+
+            {/* ── NON-AGENT: Individual services ── */}
+            {!isAgent && (
+              <IndividualServices form={form} set={set} isAgent={false} isCompany={isCompany} />
+            )}
+
+          </div>
+        )}
+
+        {/* ══ STEP 2: Planes ══ */}
+        {step === 2 && (
+          <div className="space-y-10">
+
+            {/* Bundle summary badge */}
+            {form.bundle && (
+              <div className="flex items-center gap-3 p-4 rounded-2xl bg-violet-500/5 border border-violet-500/20">
+                <span className="text-xl">📦</span>
+                <div>
+                  <p className="text-white font-bold text-sm">{AGENT_BUNDLES[form.bundle as BundleKey]?.name}</p>
+                  <p className="text-white/50 text-xs">Los servicios de tu paquete están pre-seleccionados — puedes ajustarlos aquí</p>
+                </div>
+              </div>
+            )}
+
+            {/* CM */}
+            {form.services.includes('cm') && (
+              <div>
+                <SectionLabel icon="👤" title="Community Manager" sub="Gestión mensual de redes sociales" />
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <PlanCard selected={form.cmPlan === 'basico'}   onClick={() => set('cmPlan','basico')}   title="Plan Básico"
+                    badge={isAgent ? 'Recomendado' : undefined} features={['1–2 redes sociales','Gestión de contenido diaria','Respuesta a comentarios']} />
+                  <PlanCard selected={form.cmPlan === 'estandar'} onClick={() => set('cmPlan','estandar')} title="Plan Estándar"
+                    features={['3 redes sociales','Gestión completa + DMs','Estrategia de contenido mensual']} />
+                  <PlanCard selected={form.cmPlan === 'pro'}      onClick={() => set('cmPlan','pro')}      title="Plan Pro"
+                    badge={isCompany ? 'Para empresas' : undefined} badgeColor="cyan"
+                    features={['4+ redes sociales','DMs + estrategia avanzada','Reportes y métricas mensuales']} />
+                </div>
+              </div>
+            )}
+
+            {/* Posts */}
+            {form.services.includes('posts') && (
+              <div>
+                <SectionLabel icon="🎨" title="Diseño de posts" sub="Publicaciones estáticas — mensual" />
+                <div className="grid grid-cols-2 gap-3">
+                  <PlanCard selected={form.postsPlan === 'starter'}   onClick={() => set('postsPlan','starter')}   title="Starter"
+                    badge={isAgent ? 'Ideal para ti' : undefined} features={['Hasta 12 diseños/mes','Presencia constante en redes']} />
+                  <PlanCard selected={form.postsPlan === 'estandar'}  onClick={() => set('postsPlan','estandar')}  title="Estándar"
+                    features={['13–20 diseños/mes','Marca activa y consistente']} />
+                  <PlanCard selected={form.postsPlan === 'premium'}   onClick={() => set('postsPlan','premium')}   title="Premium"
+                    features={['21–30 diseños/mes','Para campañas y lanzamientos']} />
+                  <PlanCard selected={form.postsPlan === 'intensivo'} onClick={() => set('postsPlan','intensivo')} title="Intensivo"
+                    badge={isCompany ? 'Alta producción' : undefined} badgeColor="cyan" features={['+30 diseños/mes','Máxima producción de contenido']} />
+                </div>
+              </div>
+            )}
+
+            {/* Reels */}
+            {form.services.includes('reels') && (
+              <div>
+                <SectionLabel icon="🎬" title="Reels y video" sub="Producción y edición de video corto — mensual" />
+                <div className="grid grid-cols-2 gap-3">
+                  <PlanCard selected={form.reelsPlan === 'starter'}   onClick={() => set('reelsPlan','starter')}   title="Starter"
+                    badge={isAgent ? 'Para empezar' : undefined} features={['1–4 reels/mes','Ideal para comenzar con video']} />
+                  <PlanCard selected={form.reelsPlan === 'estandar'}  onClick={() => set('reelsPlan','estandar')}  title="Estándar"
+                    features={['5–8 reels/mes','Presencia sólida en video']} />
+                  <PlanCard selected={form.reelsPlan === 'premium'}   onClick={() => set('reelsPlan','premium')}   title="Premium"
+                    features={['9–12 reels/mes','Video como motor de contenido']} />
+                  <PlanCard selected={form.reelsPlan === 'intensivo'} onClick={() => set('reelsPlan','intensivo')} title="Intensivo"
+                    badge={isCompany ? 'Full video' : undefined} badgeColor="cyan" features={['+12 reels/mes','Estrategia 100% en video']} />
+                </div>
+              </div>
+            )}
+
+            {/* Ads */}
+            {form.services.includes('ads') && (
+              <div>
+                <SectionLabel icon="📣" title="Publicidad digital" sub="Elige una o varias plataformas" />
+                <div className="flex flex-wrap gap-3">
+                  {([
+                    { id: 'meta'   as AdsPlat, icon: '📘', label: 'Meta Ads',   sub: 'Facebook + Instagram' },
+                    { id: 'google' as AdsPlat, icon: '🔍', label: 'Google Ads', sub: 'Búsqueda y display' },
+                    { id: 'tiktok' as AdsPlat, icon: '🎵', label: 'TikTok Ads', sub: 'Video en tendencia' },
+                  ] as const).map(p => {
+                    const sel = form.adsPlatforms.includes(p.id)
+                    return (
+                      <button key={p.id} type="button"
+                        onClick={() => set('adsPlatforms', toggle(form.adsPlatforms, p.id))}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-2xl border-2 transition-all ${
+                          sel ? 'border-violet-500 bg-violet-500/10 text-white' : 'border-[#2a2a3a] bg-[#18181f] text-white/60 hover:border-violet-500/30 hover:text-white/80'
+                        }`}
+                      >
+                        <span className="text-xl">{p.icon}</span>
+                        <div className="text-left">
+                          <p className="text-sm font-bold leading-tight">{p.label}</p>
+                          <p className="text-xs opacity-60 leading-tight">{p.sub}</p>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+                <p className="text-white/30 text-xs mt-3">La pauta publicitaria se cotiza aparte según tu presupuesto mensual</p>
+              </div>
+            )}
+
+            {/* Producción */}
+            {form.services.includes('produccion') && (
+              <div>
+                <SectionLabel icon="📷" title="Foto y video profesional" sub="Sesión completa — precio por proyecto" />
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <PlanCard selected={form.produccionPlan === 'foto'}  onClick={() => set('produccionPlan','foto')}  title="Fotografía"
+                    features={['Sesión fotográfica completa','Entregables editados en alta res','Derechos de uso comercial']} />
+                  <PlanCard selected={form.produccionPlan === 'video'} onClick={() => set('produccionPlan','video')} title="Video / Reel"
+                    features={['Producción de video profesional','Edición con color y motion','Formatos para distintas plataformas']} />
+                  <PlanCard selected={form.produccionPlan === 'pack'}  onClick={() => set('produccionPlan','pack')}  title="Pack completo"
+                    badge="Mejor valor" badgeColor="lime" features={['Fotografía + video en una sesión','Todo incluido','Ideal para lanzamientos']} />
+                </div>
+              </div>
+            )}
+
+            {/* Drone */}
+            {form.services.includes('drone') && (
+              <div>
+                <SectionLabel icon="🚁" title="Tomas con drone" sub="Por proyecto — incluye foto y video aéreo" />
+                <InfoCard icon="🚁" title="Vuelo con drone — foto y video" color="violet"
+                  features={['Fotografía aérea en alta resolución','Video aéreo 4K editado','Vuelo sobre la propiedad o zona indicada','Derechos de uso comercial incluidos']} />
+              </div>
+            )}
+
+            {/* Tour 360° */}
+            {form.services.includes('tour360') && (
+              <div>
+                <SectionLabel icon="🔵" title="Recorrido virtual 360°" sub="Por proyecto — tour interactivo navegable" />
+                <InfoCard icon="🔵" title="Tour virtual 360° completo" color="cyan"
+                  features={['Captura de todos los espacios del inmueble','Tour navegable en web y móvil','Link compartible para clientes y portales','Ideal para ventas y arrendamientos']} />
+              </div>
+            )}
+
+            {/* If bundle-only agent (no extra services that need plans) */}
+            {form.bundle && !form.services.some(s => ['produccion','drone','tour360'].includes(s)) && (
+              <div className="text-center py-6">
+                <p className="text-white/40 text-sm">Todo listo con tu <strong className="text-white/60">{AGENT_BUNDLES[form.bundle as BundleKey]?.name}</strong>.</p>
+                <p className="text-white/30 text-xs mt-1">Continúa para darnos tus datos de contacto.</p>
+              </div>
+            )}
+
+          </div>
+        )}
+
+        {/* ══ STEP 3: Contacto ══ */}
+        {step === 3 && (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-white/60 text-xs font-semibold mb-1.5 uppercase tracking-wide">Nombre completo *</label>
+              <input type="text" value={form.nombre} onChange={e => set('nombre', e.target.value)} placeholder="Tu nombre"
+                className="w-full px-4 py-3 rounded-2xl bg-[#18181f] border border-[#2a2a3a] text-white placeholder-white/25 text-sm focus:outline-none focus:border-violet-500 transition" />
+            </div>
+            <div>
+              <label className="block text-white/60 text-xs font-semibold mb-1.5 uppercase tracking-wide">
+                {form.clientType === 'agente' ? 'Nombre comercial / agencia' : form.clientType === 'empresa' ? 'Nombre de la empresa *' : 'Nombre del negocio'}
+                {form.clientType === 'agente' && <span className="ml-1 text-white/30 normal-case font-normal">(opcional)</span>}
+              </label>
+              <input type="text" value={form.empresa} onChange={e => set('empresa', e.target.value)}
+                placeholder={form.clientType === 'agente' ? 'Tu agencia o marca personal' : form.clientType === 'empresa' ? 'Nombre de tu empresa' : 'Nombre de tu negocio'}
+                className="w-full px-4 py-3 rounded-2xl bg-[#18181f] border border-[#2a2a3a] text-white placeholder-white/25 text-sm focus:outline-none focus:border-violet-500 transition" />
+            </div>
+            <div>
+              <label className="block text-white/60 text-xs font-semibold mb-1.5 uppercase tracking-wide">WhatsApp *</label>
+              <input type="tel" value={form.whatsapp} onChange={e => set('whatsapp', e.target.value)} placeholder="+52 998 000 0000"
+                className="w-full px-4 py-3 rounded-2xl bg-[#18181f] border border-[#2a2a3a] text-white placeholder-white/25 text-sm focus:outline-none focus:border-violet-500 transition" />
+            </div>
+            <div>
+              <label className="block text-white/60 text-xs font-semibold mb-1.5 uppercase tracking-wide">Correo electrónico *</label>
+              <input type="email" value={form.email} onChange={e => set('email', e.target.value)} placeholder="tu@correo.com"
+                className="w-full px-4 py-3 rounded-2xl bg-[#18181f] border border-[#2a2a3a] text-white placeholder-white/25 text-sm focus:outline-none focus:border-violet-500 transition" />
+            </div>
+            <div>
+              <label className="block text-white/60 text-xs font-semibold mb-1.5 uppercase tracking-wide">
+                Cuéntanos más <span className="ml-1 text-white/30 normal-case font-normal">(opcional)</span>
+              </label>
+              <textarea value={form.notas} onChange={e => set('notas', e.target.value)}
+                placeholder="¿Tienes alguna fecha límite, proyecto específico o algo que debamos saber?" rows={3}
+                className="w-full px-4 py-3 rounded-2xl bg-[#18181f] border border-[#2a2a3a] text-white placeholder-white/25 text-sm focus:outline-none focus:border-violet-500 transition resize-none" />
+            </div>
+            <div className="flex items-start gap-3 p-4 rounded-2xl bg-[#18181f] border border-[#2a2a3a]">
+              <span className="text-xl shrink-0">📄</span>
+              <div>
+                <p className="text-white text-xs font-bold mb-0.5">Recibirás una propuesta personalizada en PDF</p>
+                <p className="text-white/40 text-xs leading-relaxed">Preparamos un documento con los servicios elegidos, detalles y próximos pasos.</p>
+              </div>
+            </div>
+            {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+          </div>
+        )}
+
+        {/* Navigation */}
+        <div className="flex items-center gap-3 mt-8">
+          {step > 0 && (
+            <button type="button" onClick={() => setStep(s => s - 1)}
+              className="px-5 py-3 rounded-2xl border border-[#2a2a3a] text-white/50 text-sm font-semibold hover:text-white hover:border-white/20 transition">
+              ← Anterior
+            </button>
+          )}
+          {step < TOTAL_STEPS - 1 ? (
+            <button type="button" onClick={() => canProceed() && setStep(s => s + 1)} disabled={!canProceed()}
+              className={`flex-1 py-3 rounded-2xl text-sm font-bold transition-all ${
+                canProceed() ? 'bg-gradient-to-r from-violet-500 to-cyan-500 text-white hover:opacity-90' : 'bg-[#18181f] text-white/25 border border-[#2a2a3a] cursor-not-allowed'
+              }`}>
+              Continuar →
+            </button>
+          ) : (
+            <button type="button" onClick={submit} disabled={!canProceed() || loading}
+              className={`flex-1 py-3 rounded-2xl text-sm font-bold transition-all ${
+                canProceed() && !loading ? 'bg-gradient-to-r from-violet-500 to-cyan-500 text-white hover:opacity-90' : 'bg-[#18181f] text-white/25 border border-[#2a2a3a] cursor-not-allowed'
+              }`}>
+              {loading ? 'Enviando...' : 'Enviar solicitud →'}
+            </button>
+          )}
+        </div>
+
       </div>
     </div>
   )
 }
 
-/* ─── Detail section wrapper ─────────────────────────────────────────── */
-function DetailSection({ title, color, children }: { title: string; color: string; children: React.ReactNode }) {
-  return (
-    <div className="p-5 rounded-2xl bg-[#18181f] border border-[#2a2a3a]">
-      <div className="flex items-center gap-2 mb-4">
-        <div className="w-1 h-4 rounded-full" style={{ background: color }} />
-        <p className="text-sm font-bold text-white">{title}</p>
-      </div>
-      {children}
-    </div>
-  )
-}
+/* ─── Individual services (reusable for agents in custom mode + non-agents) ── */
+function IndividualServices({ form, set, isAgent, isCompany }: {
+  form: QuoteForm
+  set: <K extends keyof QuoteForm>(key: K, val: QuoteForm[K]) => void
+  isAgent: boolean
+  isCompany: boolean
+}) {
+  type ServiceKey = 'cm' | 'posts' | 'reels' | 'ads' | 'produccion' | 'drone' | 'tour360'
+  const toggleSvc = (id: ServiceKey) =>
+    set('services', form.services.includes(id) ? form.services.filter(x => x !== id) : [...form.services, id])
 
-/* ─── Success screen ─────────────────────────────────────────────────── */
-function SuccessScreen({ nombre }: { nombre: string }) {
   return (
-    <div className="min-h-screen bg-[#09090b] flex flex-col items-center justify-center px-4 text-center">
-      <div className="mb-8">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo.png" alt="JUN" className="h-10 w-auto mx-auto mb-8" style={{ filter: 'invert(1) brightness(1.1)' }} />
-      </div>
-      <div className="w-14 h-14 rounded-full flex items-center justify-center mb-6"
-        style={{ background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)' }}>
-        <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-        </svg>
-      </div>
-      <h1 className="text-2xl sm:text-3xl font-black text-white mb-3">
-        ¡Listo, {nombre.split(' ')[0]}!
-      </h1>
-      <p className="text-white/55 max-w-sm leading-relaxed mb-2">
-        Recibimos tu solicitud. Revisamos los servicios que necesitas y te contactamos en menos de 24 horas con una propuesta personalizada.
-      </p>
-      <p className="text-white/30 text-sm mb-10">Revisa tu correo — también te enviamos una confirmación.</p>
-      <Link
-        href="/"
-        className="px-8 py-3 rounded-2xl border border-[#2a2a3a] text-white/60 text-sm font-semibold hover:border-white/20 hover:text-white transition-all"
-      >
-        Volver al inicio
-      </Link>
+    <div className="space-y-2">
+      {([
+        { id: 'cm'        as ServiceKey, icon: '👤', title: 'Community Manager',       sub: 'Gestión diaria de redes sociales',               badge: isAgent ? 'Popular entre agentes' : undefined },
+        { id: 'posts'     as ServiceKey, icon: '🎨', title: 'Diseño de posts',          sub: 'Contenido estático y visual para redes',         badge: undefined },
+        { id: 'reels'     as ServiceKey, icon: '🎬', title: 'Reels y video',            sub: 'Producción y edición de video corto',            badge: undefined },
+        { id: 'ads'       as ServiceKey, icon: '📣', title: 'Publicidad digital',       sub: 'Campañas en Meta, Google o TikTok',              badge: undefined },
+        { id: 'produccion'as ServiceKey, icon: '📷', title: 'Foto y video profesional', sub: 'Sesión de alta calidad — por proyecto',          badge: undefined },
+        { id: 'drone'     as ServiceKey, icon: '🚁', title: 'Tomas con drone',          sub: 'Fotografía y video aéreo — por proyecto',       badge: undefined },
+        { id: 'tour360'   as ServiceKey, icon: '🔵', title: 'Recorrido virtual 360°',  sub: 'Tour interactivo navegable — por proyecto',     badge: undefined },
+      ] as const).map(svc => {
+        const sel = form.services.includes(svc.id)
+        return (
+          <button key={svc.id} type="button" onClick={() => toggleSvc(svc.id)}
+            className={`w-full text-left p-4 rounded-2xl border-2 transition-all flex items-center gap-4 ${
+              sel ? 'border-violet-500 bg-violet-500/10' : 'border-[#2a2a3a] bg-[#18181f] hover:border-violet-500/30'
+            }`}
+          >
+            <span className="text-xl shrink-0">{svc.icon}</span>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="font-bold text-white text-sm">{svc.title}</p>
+                {svc.badge && <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30">{svc.badge}</span>}
+              </div>
+              <p className="text-white/50 text-xs mt-0.5">{svc.sub}</p>
+            </div>
+            <div className={`shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+              sel ? 'border-violet-500 bg-violet-500' : 'border-white/20'
+            }`}>
+              {sel && <span className="text-white text-xs font-bold">✓</span>}
+            </div>
+          </button>
+        )
+      })}
+      <p className="text-white/30 text-xs text-center pt-1">Puedes combinar varios servicios</p>
     </div>
   )
 }
