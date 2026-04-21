@@ -215,9 +215,9 @@ export default function AudiovisualPage() {
                 Cámaras profesionales, drone y recorridos 360°. Cada servicio es independiente. Nos adaptamos exactamente a lo que tu proyecto necesita.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <a href={WA} target="_blank" rel="noopener noreferrer" className="cta-primary">
+                <Link href="/cotizar" className="cta-primary">
                   Solicitar cotización
-                </a>
+                </Link>
                 <Link href="/#servicios" className="cta-secondary">
                   Ver todos los servicios
                 </Link>
@@ -310,10 +310,10 @@ export default function AudiovisualPage() {
                           ))}
                         </ul>
                         <div className="mt-7">
-                          <a href={WA} target="_blank" rel="noopener noreferrer"
+                          <Link href="/cotizar"
                             className="text-sm font-semibold text-jun-sand hover:text-white transition-colors duration-200">
                             Cotizar este servicio →
-                          </a>
+                          </Link>
                         </div>
                       </div>
                     </div>

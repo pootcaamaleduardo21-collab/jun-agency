@@ -167,14 +167,9 @@ export default function AdsPage() {
                 Meta, Google y TikTok. Campañas diseñadas con estrategia, no con intuición. Tú defines el objetivo, nosotros lo hacemos posible.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <a
-                  href="https://wa.me/529851089671?text=Hola%2C%20me%20interesa%20el%20servicio%20de%20publicidad%20digital"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="cta-primary"
-                >
-                  Solicitar diagnóstico gratuito
-                </a>
+                <Link href="/cotizar" className="cta-primary">
+                  Solicitar cotización
+                </Link>
                 <Link href="/community-manager" className="cta-secondary">
                   Ver Community Manager
                 </Link>
@@ -281,14 +276,9 @@ export default function AdsPage() {
                 <p className="text-white/50 text-sm sm:text-base leading-relaxed mb-8">
                   Cuéntanos tu objetivo y te preparamos un diagnóstico estratégico sin costo. Sin compromisos, con claridad.
                 </p>
-                <a
-                  href="https://wa.me/529851089671?text=Hola%2C%20me%20interesa%20el%20servicio%20de%20publicidad%20digital"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="cta-primary"
-                >
-                  Solicitar diagnóstico gratuito
-                </a>
+                <Link href="/cotizar" className="cta-primary">
+                  Solicitar cotización
+                </Link>
               </div>
             </div>
           </div>

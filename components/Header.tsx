@@ -10,7 +10,7 @@ export default function Header() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-jun-black/80 backdrop-blur-md border-b border-white/5">
       <div className="container-max flex items-center justify-between py-4">
         {/* Logo */}
-        <div className="flex items-center">
+        <Link href="/" className="flex items-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/logo.png"
@@ -18,7 +18,7 @@ export default function Header() {
             className="h-12 w-auto"
             style={{ filter: 'invert(1) brightness(1.1)' }}
           />
-        </div>
+        </Link>
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-8">

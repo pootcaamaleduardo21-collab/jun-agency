@@ -195,9 +195,9 @@ export default function CommunityManagerPage() {
                 No solo publicamos. Construimos presencia, voz de marca y comunidad alrededor de tu proyecto. 100% orgánico, sin pauta incluida.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <a href={WA} target="_blank" rel="noopener noreferrer" className="cta-primary">
-                  Solicitar información
-                </a>
+                <Link href="/cotizar" className="cta-primary">
+                  Solicitar cotización
+                </Link>
                 <Link href="/ads" className="cta-secondary">
                   Ver servicio de Ads
                 </Link>

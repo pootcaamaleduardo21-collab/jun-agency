@@ -264,7 +264,10 @@ export default function CotizarPage() {
       {/* Top bar */}
       <div className="border-b border-white/5 px-4 py-4">
         <div className="max-w-xl mx-auto flex items-center justify-between">
-          <Link href="/" className="text-white font-black text-xl tracking-tight">jún</Link>
+          <Link href="/" className="flex items-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="JUN" className="h-9 w-auto" style={{ filter: 'invert(1) brightness(1.1)' }} />
+          </Link>
           <span className="text-white/30 text-xs">Paso {step + 1} de {TOTAL_STEPS}</span>
         </div>
       </div>
