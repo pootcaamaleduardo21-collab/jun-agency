@@ -201,21 +201,29 @@ function CartTotal({ form }: { form: QuoteForm }) {
   const total = calcTotal(form)
   if (total === 0) return null
   const b = form.bundle ? AGENT_BUNDLES[form.bundle as BundleKey] : null
+  const hasProjectAddons = form.services.some(s => ['produccion', 'drone', 'tour360'].includes(s))
   return (
-    <div className="mt-6 rounded-2xl border border-white/8 bg-white/[0.03] p-4 flex items-center justify-between gap-4">
-      <div className="min-w-0">
-        <p className="text-white/40 text-[10px] uppercase tracking-wide font-semibold mb-1">Tu plan actual</p>
-        <div className="flex flex-wrap gap-x-3 gap-y-0.5">
-          {b && <span className="text-white/60 text-xs">{b.name}</span>}
-          {form.adsPlatforms.map(p => (
-            <span key={p} className="text-cyan-400/70 text-xs capitalize">+ {p} ads</span>
-          ))}
+    <div className="mt-6 space-y-1.5">
+      <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-4 flex items-center justify-between gap-4">
+        <div className="min-w-0">
+          <p className="text-white/40 text-[10px] uppercase tracking-wide font-semibold mb-1">Plan mensual</p>
+          <div className="flex flex-wrap gap-x-3 gap-y-0.5">
+            {b && <span className="text-white/60 text-xs">{b.name}</span>}
+            {form.adsPlatforms.map(p => (
+              <span key={p} className="text-cyan-400/70 text-xs capitalize">+ {p} ads</span>
+            ))}
+          </div>
+        </div>
+        <div className="shrink-0 text-right">
+          <p className="text-white font-black text-2xl leading-none">${total.toLocaleString('es-MX')}</p>
+          <p className="text-white/35 text-[10px] mt-0.5">/mes</p>
         </div>
       </div>
-      <div className="shrink-0 text-right">
-        <p className="text-white font-black text-2xl leading-none">${total.toLocaleString('es-MX')}</p>
-        <p className="text-white/35 text-[10px] mt-0.5">/mes</p>
-      </div>
+      {hasProjectAddons && (
+        <p className="text-white/30 text-[11px] text-center px-2">
+          + Los servicios adicionales (drone, 360°, producción) se cotizan por separado según el proyecto
+        </p>
+      )}
     </div>
   )
 }
