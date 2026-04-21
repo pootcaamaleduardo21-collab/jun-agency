@@ -428,19 +428,33 @@ export default function CotizarPage() {
         {step === 2 && (
           <div className="space-y-10">
 
-            {/* Bundle summary badge */}
-            {form.bundle && (
-              <div className="flex items-center gap-3 p-4 rounded-2xl bg-violet-500/5 border border-violet-500/20">
-                <span className="text-xl">📦</span>
-                <div>
-                  <p className="text-white font-bold text-sm">{AGENT_BUNDLES[form.bundle as BundleKey]?.name}</p>
-                  <p className="text-white/50 text-xs">Los servicios de tu paquete están pre-seleccionados — puedes ajustarlos aquí</p>
+            {/* Bundle summary — replaces plan cards when a bundle is active */}
+            {form.bundle && (() => {
+              const b = AGENT_BUNDLES[form.bundle as BundleKey]
+              return (
+                <div className="rounded-2xl border border-violet-500/30 bg-violet-500/5 p-5 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">📦</span>
+                    <div>
+                      <p className="text-white font-bold">{b?.name}</p>
+                      <p className="text-white/50 text-xs">{b?.tagline}</p>
+                    </div>
+                    <span className="ml-auto text-violet-300 font-black text-lg">{b?.price}</span>
+                  </div>
+                  <ul className="space-y-1.5 pt-1">
+                    {b?.features.map((f, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-white/70">
+                        <span className="text-violet-400 mt-0.5 flex-shrink-0">✓</span>{f}
+                      </li>
+                    ))}
+                  </ul>
+                  {b?.note && <p className="text-xs text-white/40 border-t border-white/5 pt-3">{b.note}</p>}
                 </div>
-              </div>
-            )}
+              )
+            })()}
 
-            {/* CM */}
-            {form.services.includes('cm') && (
+            {/* CM — only when NO bundle active */}
+            {!form.bundle && form.services.includes('cm') && (
               <div>
                 <SectionLabel icon="👤" title="Community Manager" sub="Gestión mensual de redes sociales" />
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -455,8 +469,8 @@ export default function CotizarPage() {
               </div>
             )}
 
-            {/* Posts */}
-            {form.services.includes('posts') && (
+            {/* Posts — only when NO bundle active */}
+            {!form.bundle && form.services.includes('posts') && (
               <div>
                 <SectionLabel icon="🎨" title="Diseño de posts" sub="Publicaciones estáticas — mensual" />
                 <div className="grid grid-cols-2 gap-3">
@@ -472,8 +486,8 @@ export default function CotizarPage() {
               </div>
             )}
 
-            {/* Reels */}
-            {form.services.includes('reels') && (
+            {/* Reels — only when NO bundle active */}
+            {!form.bundle && form.services.includes('reels') && (
               <div>
                 <SectionLabel icon="🎬" title="Reels y video" sub="Producción y edición de video corto — mensual" />
                 <div className="grid grid-cols-2 gap-3">
@@ -553,12 +567,9 @@ export default function CotizarPage() {
               </div>
             )}
 
-            {/* If bundle-only agent (no extra services that need plans) */}
+            {/* Bundle with no add-on project services — prompt to continue */}
             {form.bundle && !form.services.some(s => ['produccion','drone','tour360'].includes(s)) && (
-              <div className="text-center py-6">
-                <p className="text-white/40 text-sm">Todo listo con tu <strong className="text-white/60">{AGENT_BUNDLES[form.bundle as BundleKey]?.name}</strong>.</p>
-                <p className="text-white/30 text-xs mt-1">Continúa para darnos tus datos de contacto.</p>
-              </div>
+              <p className="text-white/30 text-xs text-center pt-2">¿Necesitas añadir drone, recorrido 360° o producción? Puedes volver al paso anterior.</p>
             )}
 
           </div>

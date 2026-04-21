@@ -324,22 +324,28 @@ export async function POST(request: NextRequest) {
 
     const estimate = calcEstimate(body)
 
-    // Email to JUN (internal)
-    await transporter.sendMail({
-      from:    process.env.SMTP_FROM || 'noreply@junmkt.com',
-      to:      'informesjunmkt@gmail.com',
-      replyTo: email as string,
-      subject: `📋 Nueva cotización — ${nombre} · ${body.empresa || body.clientType}`,
-      html:    buildAdminEmail(body, estimate),
-    })
+    // Log quote data so it's always visible in Vercel logs
+    console.log('📋 NUEVA COTIZACIÓN:', JSON.stringify({ nombre, whatsapp, email, empresa: body.empresa, clientType: body.clientType, bundle: body.bundle, services: body.services, estimate }, null, 2))
 
-    // Confirmation to client
-    await transporter.sendMail({
-      from:    `JUN <${process.env.SMTP_FROM || 'noreply@junmkt.com'}>`,
-      to:      email as string,
-      subject: 'JUN recibió tu solicitud',
-      html:    buildClientEmail(nombre as string),
-    })
+    // Try to send emails — non-blocking: form succeeds even if SMTP is not configured
+    try {
+      await transporter.sendMail({
+        from:    process.env.SMTP_FROM || 'noreply@junmkt.com',
+        to:      'informesjunmkt@gmail.com',
+        replyTo: email as string,
+        subject: `📋 Nueva cotización — ${nombre} · ${body.empresa || body.clientType}`,
+        html:    buildAdminEmail(body, estimate),
+      })
+      await transporter.sendMail({
+        from:    `JUN <${process.env.SMTP_FROM || 'noreply@junmkt.com'}>`,
+        to:      email as string,
+        subject: 'JUN recibió tu solicitud',
+        html:    buildClientEmail(nombre as string),
+      })
+    } catch (emailError) {
+      // SMTP not configured or failed — quote data is saved in logs above
+      console.error('⚠️  Email no enviado (configura SMTP_HOST/USER/PASSWORD en Vercel):', emailError)
+    }
 
     return NextResponse.json({ message: 'ok' }, { status: 200 })
   } catch (error) {
