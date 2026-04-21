@@ -125,7 +125,7 @@ function WelcomeDoc({ quote, lines }: { quote: QuoteData; lines: ProposalLines }
 
         {/* Closing message */}
         <p className="text-gray-500 text-sm leading-relaxed italic border-t border-gray-100 pt-6">
-          "Nos emociona ser parte de tu crecimiento. Trabajemos juntos para hacer que tu marca destaque y conecte con las personas correctas."
+          &ldquo;Nos emociona ser parte de tu crecimiento. Trabajemos juntos para hacer que tu marca destaque y conecte con las personas correctas.&rdquo;
           <br /><br />
           <span className="font-bold text-gray-700">— Equipo jún</span>
         </p>
