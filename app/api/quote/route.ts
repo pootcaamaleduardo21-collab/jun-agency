@@ -1,15 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import nodemailer from 'nodemailer'
+import { Resend } from 'resend'
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: parseInt(process.env.SMTP_PORT || '587'),
-  secure: process.env.SMTP_SECURE === 'true',
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASSWORD,
-  },
-})
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 /* ─── Bundle pricing (monthly packs) ────────────────────────────────── */
 const BUNDLE_CATALOG: Record<string, { name: string; price: number }> = {
@@ -327,24 +319,24 @@ export async function POST(request: NextRequest) {
     // Log quote data so it's always visible in Vercel logs
     console.log('📋 NUEVA COTIZACIÓN:', JSON.stringify({ nombre, whatsapp, email, empresa: body.empresa, clientType: body.clientType, bundle: body.bundle, services: body.services, estimate }, null, 2))
 
-    // Try to send emails — non-blocking: form succeeds even if SMTP is not configured
+    // Try to send emails — non-blocking: form succeeds even if Resend is not configured
     try {
-      await transporter.sendMail({
-        from:    process.env.SMTP_FROM || 'noreply@junmkt.com',
-        to:      'informesjunmkt@gmail.com',
-        replyTo: email as string,
-        subject: `📋 Nueva cotización — ${nombre} · ${body.empresa || body.clientType}`,
-        html:    buildAdminEmail(body, estimate),
+      await resend.emails.send({
+        from:     'JUN <onboarding@resend.dev>',
+        to:       'informesjunmkt@gmail.com',
+        replyTo:  email as string,
+        subject:  `📋 Nueva cotización — ${nombre} · ${body.empresa || body.clientType}`,
+        html:     buildAdminEmail(body, estimate),
       })
-      await transporter.sendMail({
-        from:    `JUN <${process.env.SMTP_FROM || 'noreply@junmkt.com'}>`,
-        to:      email as string,
-        subject: 'JUN recibió tu solicitud',
-        html:    buildClientEmail(nombre as string),
+      await resend.emails.send({
+        from:     'JUN <onboarding@resend.dev>',
+        to:       email as string,
+        subject:  'JUN recibió tu solicitud',
+        html:     buildClientEmail(nombre as string),
       })
     } catch (emailError) {
-      // SMTP not configured or failed — quote data is saved in logs above
-      console.error('⚠️  Email no enviado (configura SMTP_HOST/USER/PASSWORD en Vercel):', emailError)
+      // Resend not configured or failed — quote data is saved in logs above
+      console.error('⚠️  Email no enviado (verifica RESEND_API_KEY en Vercel):', emailError)
     }
 
     return NextResponse.json({ message: 'ok' }, { status: 200 })
