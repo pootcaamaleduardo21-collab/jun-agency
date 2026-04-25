@@ -1,6 +1,6 @@
 'use client'
-import { useState, useEffect, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useState, useEffect, useCallback, Suspense } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 /* ─── Catálogo completo de precios ────────────────────────────────────── */
@@ -72,6 +72,8 @@ type ServiceKey = keyof typeof SERVICES
 
 /* ─── Types ──────────────────────────────────────────────────────────── */
 interface QuoteData {
+  id?: string
+  q?: string
   clientType: string
   bundle?: string
   services: ServiceKey[]
@@ -85,6 +87,11 @@ interface QuoteData {
   whatsapp: string
   email: string
   notas: string
+  status?: string
+  adminNote?: string
+  lines?: Record<string, string[]>
+  discount?: number
+  estimate?: { min: number; max: number; type: string }
   submittedAt?: string
 }
 
@@ -181,6 +188,104 @@ function PINScreen({ pin, setPin, onSubmit, error }: {
       </div>
     </div>
   )
+}
+
+/* ─── Quotes List ────────────────────────────────────────────────────── */
+function QuotesList({ onSelect }: { onSelect: (q: QuoteData) => void }) {
+  const [quotes, setQuotes]     = useState<QuoteData[]>([])
+  const [loading, setLoading]   = useState(true)
+  const [filter, setFilter]     = useState('all')
+
+  useEffect(() => {
+    fetch('/api/quotes')
+      .then(r => r.json())
+      .then(data => { setQuotes(data); setLoading(false) })
+      .catch(() => setLoading(false))
+  }, [])
+
+  const filtered = filter === 'all' ? quotes : quotes.filter(q => q.status === filter)
+
+  const timeAgo = (iso?: string) => {
+    if (!iso) return ''
+    const diff = Date.now() - new Date(iso).getTime()
+    const m = Math.floor(diff / 60000)
+    if (m < 60) return `hace ${m}m`
+    const h = Math.floor(m / 60)
+    if (h < 24) return `hace ${h}h`
+    return `hace ${Math.floor(h / 24)}d`
+  }
+
+  const statusColor = (s?: string) => STATUS_OPTIONS.find(o => o.key === s)?.color
+    ?? 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30'
+  const statusLabel = (s?: string) => STATUS_OPTIONS.find(o => o.key === s)?.label ?? 'Pendiente'
+
+  if (loading) return <p className="text-white/30 text-sm text-center py-12">Cargando cotizaciones…</p>
+  if (!quotes.length) return (
+    <div className="text-center py-16">
+      <div className="text-4xl mb-3">📭</div>
+      <p className="text-white/40 text-sm">Aún no hay cotizaciones guardadas.</p>
+      <p className="text-white/20 text-xs mt-1">Aparecerán aquí cuando los clientes llenen el formulario.</p>
+    </div>
+  )
+
+  return (
+    <div className="space-y-4">
+      {/* Filter tabs */}
+      <div className="flex gap-2 flex-wrap">
+        {([{ key: 'all', label: 'Todas' }, ...STATUS_OPTIONS] as { key: string; label: string }[]).map(opt => (
+          <button key={opt.key} onClick={() => setFilter(opt.key)}
+            className={`text-xs font-bold px-3 py-1.5 rounded-full border transition-all ${
+              filter === opt.key ? 'bg-violet-500/20 text-violet-300 border-violet-500/30' : 'text-white/30 border-white/10 hover:border-white/20'
+            }`}>
+            {opt.label}
+          </button>
+        ))}
+      </div>
+
+      {filtered.length === 0 && (
+        <p className="text-white/30 text-sm text-center py-8">Sin cotizaciones con este estado.</p>
+      )}
+
+      {filtered.map(q => (
+        <button key={q.id} onClick={() => onSelect(q)}
+          className="w-full text-left bg-[#111118] border border-[#2a2a3a] rounded-2xl p-4 hover:border-violet-500/40 transition-all">
+          <div className="flex items-start justify-between gap-3 flex-wrap">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                <p className="text-white font-bold text-sm truncate">{q.nombre}</p>
+                {q.empresa && <p className="text-white/40 text-xs truncate">· {q.empresa}</p>}
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${statusColor(q.status)}`}>
+                  {statusLabel(q.status)}
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-x-4 gap-y-0.5">
+                <p className="text-white/40 text-xs">{q.email}</p>
+                <p className="text-white/40 text-xs">{q.whatsapp}</p>
+              </div>
+              {q.bundle ? (
+                <p className="text-violet-300 text-xs mt-1.5">📦 {BUNDLES_REF[q.bundle as keyof typeof BUNDLES_REF]?.name ?? q.bundle}</p>
+              ) : (
+                <p className="text-white/30 text-xs mt-1.5 truncate">
+                  {(q.services ?? []).map(s => serviceShortLabel[s] ?? s).join(' · ')}
+                </p>
+              )}
+            </div>
+            <div className="text-right shrink-0">
+              {q.estimate && (
+                <p className="text-white font-bold text-sm">${q.estimate.min.toLocaleString('es-MX')} MXN</p>
+              )}
+              <p className="text-white/30 text-xs mt-0.5">{timeAgo(q.submittedAt)}</p>
+            </div>
+          </div>
+        </button>
+      ))}
+    </div>
+  )
+}
+
+const serviceShortLabel: Record<string, string> = {
+  cm: 'CM', posts: 'Posts', reels: 'Reels', ads: 'Ads',
+  produccion: 'Foto/Video', drone: 'Drone', tour360: '360°',
 }
 
 /* ─── Pricing Reference Table ────────────────────────────────────────── */
@@ -347,29 +452,18 @@ function ServiceRow({
   )
 }
 
-/* ─── No Quote View ──────────────────────────────────────────────────── */
-function NoQuoteView() {
-  return (
-    <div className="max-w-2xl mx-auto px-4 py-12 text-center">
-      <div className="text-5xl mb-4">📋</div>
-      <h2 className="text-white font-bold text-xl mb-2">Sin cotización cargada</h2>
-      <p className="text-white/50 text-sm mb-8 leading-relaxed">
-        Cuando un cliente envíe su solicitud recibirás un correo con un link directo a esta página pre-cargado con sus datos.
-        <br />También puedes ver la tabla de precios aquí abajo como referencia.
-      </p>
-    </div>
-  )
-}
 
 /* ─── Inner Component (needs useSearchParams) ───────────────────────── */
 function AdminInner() {
   const searchParams = useSearchParams()
+  const router       = useRouter()
 
   const [authenticated, setAuthenticated] = useState(false)
   const [pin, setPin] = useState('')
   const [pinError, setPinError] = useState(false)
   const [quote, setQuote] = useState<QuoteData | null>(null)
   const [decodeError, setDecodeError] = useState(false)
+  const [saving, setSaving] = useState(false)
 
   // Proposal state
   const [lines, setLines]           = useState<Record<string, string[]>>({})
@@ -386,19 +480,60 @@ function AdminInner() {
     }
   }, [])
 
-  // Decode quote param once authenticated
+  // Load quote from ?q= or ?id= param
   useEffect(() => {
     if (!authenticated) return
-    const q = searchParams.get('q')
-    if (!q) return
-    try {
-      const data = JSON.parse(atob(decodeURIComponent(q))) as QuoteData
-      setQuote(data)
-      setLines(getInitialLines(data))
-    } catch {
-      setDecodeError(true)
+    const id = searchParams.get('id')
+    const q  = searchParams.get('q')
+
+    if (id) {
+      // Load from Redis by ID (includes saved status/lines/notes)
+      fetch(`/api/quotes?id=${id}`)
+        .then(r => r.json())
+        .then((data: QuoteData) => {
+          if (!data || !data.nombre) return
+          setQuote(data)
+          setStatus(data.status || 'pending')
+          setAdminNote(data.adminNote || '')
+          setDiscount(data.discount || 0)
+          setLines(data.lines ? data.lines : getInitialLines(data))
+        })
+        .catch(() => setDecodeError(true))
+    } else if (q) {
+      try {
+        const data = JSON.parse(atob(decodeURIComponent(q))) as QuoteData
+        setQuote(data)
+        setLines(getInitialLines(data))
+      } catch {
+        setDecodeError(true)
+      }
     }
   }, [searchParams, authenticated])
+
+  // Persist changes to Redis
+  const saveToDb = useCallback(async (patch: Record<string, unknown>) => {
+    const id = searchParams.get('id') ?? quote?.id
+    if (!id) return
+    setSaving(true)
+    try {
+      await fetch('/api/quotes', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, ...patch }) })
+    } finally {
+      setSaving(false)
+    }
+  }, [searchParams, quote?.id])
+
+  const handleStatusChange = (s: string) => {
+    setStatus(s)
+    saveToDb({ status: s })
+  }
+
+  // Auto-save lines, notes, discount on change (debounced)
+  useEffect(() => {
+    if (!quote) return
+    const t = setTimeout(() => saveToDb({ lines, adminNote, discount }), 1000)
+    return () => clearTimeout(t)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lines, adminNote, discount])
 
   const handlePin = () => {
     const correct = (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_ADMIN_PIN) || 'jun2026'
@@ -442,7 +577,13 @@ function AdminInner() {
           <div className="flex items-center gap-3">
             <Link href="/" className="text-white font-black text-xl">jún</Link>
             <span className="text-white/20">/</span>
-            <span className="text-white/50 text-sm">Cotizaciones</span>
+            {quote ? (
+              <button onClick={() => router.push('/admin')} className="text-white/50 text-sm hover:text-white transition">
+                ← Lista
+              </button>
+            ) : (
+              <span className="text-white/50 text-sm">Cotizaciones</span>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -501,11 +642,12 @@ function AdminInner() {
 
                 {/* Status + actions */}
                 <div className="flex flex-col gap-2 items-end">
-                  <div className="flex gap-2 flex-wrap justify-end">
+                  <div className="flex gap-2 flex-wrap justify-end items-center">
+                    {saving && <span className="text-white/30 text-xs">Guardando…</span>}
                     {STATUS_OPTIONS.map(opt => (
                       <button
                         key={opt.key}
-                        onClick={() => setStatus(opt.key)}
+                        onClick={() => handleStatusChange(opt.key)}
                         className={`text-[11px] font-bold px-2.5 py-1 rounded-full border transition-all ${
                           status === opt.key ? opt.color : 'bg-transparent text-white/30 border-white/10 hover:border-white/20'
                         }`}
@@ -697,7 +839,16 @@ function AdminInner() {
             </div>
           </>
         ) : (
-          !decodeError && <NoQuoteView />
+          !decodeError && (
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-white font-bold text-lg">Historial de cotizaciones</p>
+              </div>
+              <QuotesList onSelect={q => {
+                if (q.q) router.push(`/admin?q=${q.q}&id=${q.id}`)
+              }} />
+            </div>
+          )
         )}
 
         {/* ── Pricing Reference Table ── */}

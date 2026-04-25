@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
+import { redis } from '@/lib/redis'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -163,9 +164,9 @@ const clientTypeLabels: Record<string, string> = {
 }
 
 /* ─── Admin email (internal) ─────────────────────────────────────────── */
-function buildAdminEmail(data: Record<string, unknown>, estimate: ReturnType<typeof calcEstimate>): string {
+function buildAdminEmail(data: Record<string, unknown>, estimate: ReturnType<typeof calcEstimate>, quoteId: string): string {
   const encoded    = encodeURIComponent(Buffer.from(JSON.stringify(data)).toString('base64'))
-  const adminLink  = `https://junmkt.com/admin?q=${encoded}`
+  const adminLink  = `https://junmkt.com/admin?q=${encoded}&id=${quoteId}`
   const services     = (data.services as string[]) || []
   const servicesHtml = services.map(s => `
     <tr>
@@ -315,9 +316,20 @@ export async function POST(request: NextRequest) {
     }
 
     const estimate = calcEstimate(body)
+    const quoteId  = crypto.randomUUID()
 
     // Log quote data so it's always visible in Vercel logs
-    console.log('📋 NUEVA COTIZACIÓN:', JSON.stringify({ nombre, whatsapp, email, empresa: body.empresa, clientType: body.clientType, bundle: body.bundle, services: body.services, estimate }, null, 2))
+    console.log('📋 NUEVA COTIZACIÓN:', JSON.stringify({ id: quoteId, nombre, whatsapp, email, empresa: body.empresa, clientType: body.clientType, bundle: body.bundle, services: body.services, estimate }, null, 2))
+
+    // Save to Redis
+    try {
+      const encoded = encodeURIComponent(Buffer.from(JSON.stringify(body)).toString('base64'))
+      const record = { id: quoteId, ...body, status: 'pending', adminNote: '', lines: null, discount: 0, estimate, submittedAt: new Date().toISOString(), q: encoded }
+      await redis.set(`quote:${quoteId}`, record)
+      await redis.zadd('quotes:list', { score: Date.now(), member: quoteId })
+    } catch (redisError) {
+      console.error('⚠️  Redis no disponible:', redisError)
+    }
 
     // Try to send emails — non-blocking: form succeeds even if Resend is not configured
     try {
@@ -326,7 +338,7 @@ export async function POST(request: NextRequest) {
         to:       'informesjunmkt@gmail.com',
         replyTo:  email as string,
         subject:  `📋 Nueva cotización — ${nombre} · ${body.empresa || body.clientType}`,
-        html:     buildAdminEmail(body, estimate),
+        html:     buildAdminEmail(body, estimate, quoteId),
       })
       await resend.emails.send({
         from:     'JUN <noreply@junmkt.com>',
