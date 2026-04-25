@@ -322,14 +322,14 @@ export async function POST(request: NextRequest) {
     // Try to send emails — non-blocking: form succeeds even if Resend is not configured
     try {
       await resend.emails.send({
-        from:     'JUN <onboarding@resend.dev>',
+        from:     'JUN <noreply@junmkt.com>',
         to:       'informesjunmkt@gmail.com',
         replyTo:  email as string,
         subject:  `📋 Nueva cotización — ${nombre} · ${body.empresa || body.clientType}`,
         html:     buildAdminEmail(body, estimate),
       })
       await resend.emails.send({
-        from:     'JUN <onboarding@resend.dev>',
+        from:     'JUN <noreply@junmkt.com>',
         to:       email as string,
         subject:  'JUN recibió tu solicitud',
         html:     buildClientEmail(nombre as string),
