@@ -73,6 +73,7 @@ type ServiceKey = keyof typeof SERVICES
 /* ─── Types ──────────────────────────────────────────────────────────── */
 interface QuoteData {
   clientType: string
+  bundle?: string
   services: ServiceKey[]
   cmPlan: string
   postsPlan: string
@@ -104,19 +105,28 @@ const STATUS_OPTIONS = [
 /* ─── Helpers ────────────────────────────────────────────────────────── */
 function getInitialLines(quote: QuoteData): Record<string, string[]> {
   const r: Record<string, string[]> = {}
-  if (quote.services.includes('cm')         && quote.cmPlan)                  r.cm         = [quote.cmPlan]
-  if (quote.services.includes('posts')      && quote.postsPlan)               r.posts      = [quote.postsPlan]
-  if (quote.services.includes('reels')      && quote.reelsPlan)               r.reels      = [quote.reelsPlan]
-  if (quote.services.includes('ads')        && quote.adsPlatforms?.length)    r.ads        = [...quote.adsPlatforms]
-  if (quote.services.includes('produccion') && quote.produccionPlan)          r.produccion = [quote.produccionPlan]
-  if (quote.services.includes('drone'))                                        r.drone      = ['standard']
-  if (quote.services.includes('tour360'))                                      r.tour360    = ['completo']
+  if (quote.bundle && BUNDLES_REF[quote.bundle as keyof typeof BUNDLES_REF]) {
+    r.bundle = [quote.bundle]
+  } else {
+    if (quote.services.includes('cm')    && quote.cmPlan)    r.cm    = [quote.cmPlan]
+    if (quote.services.includes('posts') && quote.postsPlan) r.posts = [quote.postsPlan]
+    if (quote.services.includes('reels') && quote.reelsPlan) r.reels = [quote.reelsPlan]
+  }
+  if (quote.services.includes('ads')        && quote.adsPlatforms?.length) r.ads        = [...quote.adsPlatforms]
+  if (quote.services.includes('produccion') && quote.produccionPlan)       r.produccion = [quote.produccionPlan]
+  if (quote.services.includes('drone'))                                     r.drone      = ['standard']
+  if (quote.services.includes('tour360'))                                   r.tour360    = ['completo']
   return r
 }
 
 function computeTotal(lines: Record<string, string[]>) {
   let mensual = 0, proyecto = 0
   for (const [svcKey, planKeys] of Object.entries(lines)) {
+    if (svcKey === 'bundle') {
+      const b = BUNDLES_REF[planKeys[0] as keyof typeof BUNDLES_REF]
+      if (b) mensual += b.price
+      continue
+    }
     const svc = SERVICES[svcKey as ServiceKey]
     if (!svc) continue
     for (const pk of planKeys) {
@@ -539,6 +549,25 @@ function AdminInner() {
                   <p className="text-white/40 text-xs">Activa, desactiva o cambia de plan</p>
                 </div>
 
+                {lines.bundle && (() => {
+                  const b = BUNDLES_REF[lines.bundle[0] as keyof typeof BUNDLES_REF]
+                  return b ? (
+                    <div className="rounded-2xl border border-violet-500/40 bg-[#111118] px-4 py-3 flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <span className="text-lg">📦</span>
+                        <div>
+                          <p className="text-white font-semibold text-sm">{b.name}</p>
+                          <p className="text-white/40 text-xs">{b.desc}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border bg-violet-500/20 text-violet-300 border-violet-500/30">Mensual</span>
+                        <p className="text-white font-bold text-sm">{fmt(b.price)}</p>
+                      </div>
+                    </div>
+                  ) : null
+                })()}
+
                 {(Object.keys(SERVICES) as ServiceKey[]).map(key => (
                   <ServiceRow key={key} svcKey={key} lines={lines} onChange={setLines} />
                 ))}
@@ -567,6 +596,19 @@ function AdminInner() {
                     </div>
                     <div className="p-5 space-y-2">
                       {Object.entries(lines).map(([svcKey, planKeys]) => {
+                        if (svcKey === 'bundle') {
+                          const b = BUNDLES_REF[planKeys[0] as keyof typeof BUNDLES_REF]
+                          if (!b) return null
+                          return (
+                            <div key="bundle" className="flex justify-between items-start gap-2">
+                              <div>
+                                <p className="text-violet-300 text-xs font-semibold">📦 {b.name}</p>
+                                <p className="text-white/40 text-[11px]">{b.desc}</p>
+                              </div>
+                              <p className="text-white text-sm font-semibold shrink-0">{fmt(b.price)}</p>
+                            </div>
+                          )
+                        }
                         const svc = SERVICES[svcKey as ServiceKey]
                         if (!svc) return null
                         const plans = svc.plans as Record<string, { name: string; price: number }>
