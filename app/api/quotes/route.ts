@@ -3,6 +3,8 @@ import { Resend } from 'resend'
 import { redis } from '@/lib/redis'
 
 type ProposalLines = Record<string, string[]>
+type PriceAdjustments = Record<string, number>
+type CustomItem = { id: string; label: string; description?: string; price: number; type: 'mensual' | 'proyecto' }
 
 const SERVICES = {
   cm: {
@@ -88,13 +90,18 @@ function historyEvent(action: string, label: string, details?: Record<string, un
   return { at: new Date().toISOString(), action, label, ...(details && { details }) }
 }
 
-function getLineItems(lines: ProposalLines) {
-  const items: Array<{ service: string; plan: string; desc: string; price: number; type: string }> = []
+function getLineId(serviceKey: string, planKey: string) {
+  return `${serviceKey}:${planKey}`
+}
+
+function getLineItems(lines: ProposalLines, priceAdjustments: PriceAdjustments = {}, customItems: CustomItem[] = []) {
+  const items: Array<{ id: string; service: string; plan: string; desc: string; price: number; type: string }> = []
 
   for (const [serviceKey, planKeys] of Object.entries(lines || {})) {
     if (serviceKey === 'bundle') {
       const bundle = BUNDLES[planKeys[0] as keyof typeof BUNDLES]
-      if (bundle) items.push({ service: 'Plan mensual', plan: bundle.name, desc: bundle.desc, price: bundle.price, type: 'mensual' })
+      const id = getLineId(serviceKey, planKeys[0])
+      if (bundle) items.push({ id, service: 'Plan mensual', plan: bundle.name, desc: bundle.desc, price: priceAdjustments[id] ?? bundle.price, type: 'mensual' })
       continue
     }
 
@@ -104,23 +111,40 @@ function getLineItems(lines: ProposalLines) {
     const plans = service.plans as Record<string, { name: string; desc: string; price: number }>
     for (const planKey of planKeys) {
       const plan = plans[planKey]
-      if (plan) items.push({ service: service.label, plan: plan.name, desc: plan.desc, price: plan.price, type: service.type })
+      const id = getLineId(serviceKey, planKey)
+      if (plan) items.push({ id, service: service.label, plan: plan.name, desc: plan.desc, price: priceAdjustments[id] ?? plan.price, type: service.type })
     }
   }
 
-  return items
+  return [
+    ...items,
+    ...(customItems || []).filter(item => item.label).map(item => ({
+      id: item.id,
+      service: 'Extra personalizado',
+      plan: item.label,
+      desc: item.description || 'Ajuste agregado manualmente',
+      price: priceAdjustments[item.id] ?? (Number(item.price) || 0),
+      type: item.type,
+    })),
+  ]
 }
 
-function computeTotal(lines: ProposalLines, discount = 0) {
-  const items = getLineItems(lines)
+function computeTotal(lines: ProposalLines, discount = 0, priceAdjustments: PriceAdjustments = {}, customItems: CustomItem[] = []) {
+  const items = getLineItems(lines, priceAdjustments, customItems)
   const mensual = items.filter(i => i.type === 'mensual').reduce((sum, item) => sum + item.price, 0)
   const proyecto = items.filter(i => i.type === 'proyecto').reduce((sum, item) => sum + item.price, 0)
   const total = Math.max(0, mensual + proyecto - discount)
   return { items, mensual, proyecto, subtotal: mensual + proyecto, total }
 }
 
-function buildProposalEmail(quote: Record<string, unknown>, lines: ProposalLines, discount = 0) {
-  const totals = computeTotal(lines, discount)
+function buildProposalEmail(
+  quote: Record<string, unknown>,
+  lines: ProposalLines,
+  discount = 0,
+  priceAdjustments: PriceAdjustments = {},
+  customItems: CustomItem[] = []
+) {
+  const totals = computeTotal(lines, discount, priceAdjustments, customItems)
   const firstName = String(quote.nombre || '').split(' ')[0] || 'hola'
   const itemsHtml = totals.items.map(item => `
     <tr>
@@ -201,7 +225,7 @@ export async function GET(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
-    const { id, status, adminNote, lines, discount } = await request.json()
+    const { id, status, adminNote, lines, discount, priceAdjustments, customItems, client } = await request.json()
     if (!id) return NextResponse.json({ error: 'Falta id' }, { status: 400 })
 
     const existing = await redis.get(`quote:${id}`) as Record<string, unknown> | null
@@ -218,13 +242,30 @@ export async function PATCH(request: NextRequest) {
     if (discount !== undefined && discount !== existing.discount) {
       events.push(historyEvent('discount_updated', 'Descuento actualizado', { from: existing.discount || 0, to: discount }))
     }
+    if (priceAdjustments !== undefined && !sameJson(priceAdjustments, existing.priceAdjustments)) {
+      events.push(historyEvent('prices_updated', 'Precios ajustados manualmente'))
+    }
+    if (customItems !== undefined && !sameJson(customItems, existing.customItems)) {
+      events.push(historyEvent('custom_items_updated', 'Extras personalizados actualizados'))
+    }
+    if (client !== undefined) {
+      events.push(historyEvent('client_updated', 'Información del cliente actualizada'))
+    }
 
     const updated = {
       ...existing,
+      ...(client?.nombre    !== undefined && { nombre: client.nombre }),
+      ...(client?.empresa   !== undefined && { empresa: client.empresa }),
+      ...(client?.whatsapp  !== undefined && { whatsapp: client.whatsapp }),
+      ...(client?.email     !== undefined && { email: client.email }),
+      ...(client?.notas     !== undefined && { notas: client.notas }),
+      ...(client?.clientType !== undefined && { clientType: client.clientType }),
       ...(status    !== undefined && { status }),
       ...(adminNote !== undefined && { adminNote }),
       ...(lines     !== undefined && { lines }),
       ...(discount  !== undefined && { discount }),
+      ...(priceAdjustments !== undefined && { priceAdjustments }),
+      ...(customItems !== undefined && { customItems }),
       updatedAt: new Date().toISOString(),
       history: [...history, ...events],
     }
@@ -238,7 +279,58 @@ export async function PATCH(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { id, lines, discount } = await request.json()
+    const body = await request.json()
+    const { action, id, lines, discount, priceAdjustments, customItems } = body
+
+    if (action === 'create') {
+      const quote = body.quote || {}
+      if (!quote.nombre) return NextResponse.json({ error: 'Falta nombre del cliente' }, { status: 400 })
+
+      const quoteId = crypto.randomUUID()
+      const submittedAt = new Date().toISOString()
+      const normalized = {
+        clientType: quote.clientType || 'empresa',
+        bundle: '',
+        services: [],
+        cmPlan: '',
+        postsPlan: '',
+        reelsPlan: '',
+        adsPlatforms: [],
+        produccionPlan: '',
+        nombre: quote.nombre,
+        empresa: quote.empresa || '',
+        whatsapp: quote.whatsapp || '',
+        email: quote.email || '',
+        notas: quote.notas || '',
+      }
+      const encoded = encodeURIComponent(Buffer.from(JSON.stringify(normalized)).toString('base64'))
+      const finalLines = (lines || {}) as ProposalLines
+      const finalDiscount = Number(discount || 0)
+      const finalPriceAdjustments = (priceAdjustments || {}) as PriceAdjustments
+      const finalCustomItems = (customItems || []) as CustomItem[]
+      const totals = computeTotal(finalLines, finalDiscount, finalPriceAdjustments, finalCustomItems)
+      const record = {
+        id: quoteId,
+        ...normalized,
+        source: 'manual',
+        status: 'pending',
+        adminNote: quote.adminNote || '',
+        lines: finalLines,
+        discount: finalDiscount,
+        priceAdjustments: finalPriceAdjustments,
+        customItems: finalCustomItems,
+        estimate: { min: totals.total, max: totals.total, type: totals.mensual && totals.proyecto ? 'mixto' : totals.mensual ? 'mensual' : 'por proyecto' },
+        submittedAt,
+        updatedAt: submittedAt,
+        history: [historyEvent('created_manual', 'Cotización creada manualmente')],
+        q: encoded,
+      }
+
+      await redis.set(`quote:${quoteId}`, record)
+      await redis.zadd('quotes:list', { score: Date.now(), member: quoteId })
+      return NextResponse.json({ ok: true, quote: record })
+    }
+
     if (!id) return NextResponse.json({ error: 'Falta id' }, { status: 400 })
 
     const existing = await redis.get(`quote:${id}`) as Record<string, unknown> | null
@@ -247,7 +339,9 @@ export async function POST(request: NextRequest) {
 
     const finalLines = (lines || existing.lines || {}) as ProposalLines
     const finalDiscount = Number(discount ?? existing.discount ?? 0)
-    const html = buildProposalEmail(existing, finalLines, finalDiscount)
+    const finalPriceAdjustments = (priceAdjustments || existing.priceAdjustments || {}) as PriceAdjustments
+    const finalCustomItems = (customItems || existing.customItems || []) as CustomItem[]
+    const html = buildProposalEmail(existing, finalLines, finalDiscount, finalPriceAdjustments, finalCustomItems)
 
     if (!process.env.RESEND_API_KEY) {
       return NextResponse.json({ error: 'RESEND_API_KEY no está configurada' }, { status: 500 })
@@ -268,6 +362,8 @@ export async function POST(request: NextRequest) {
       ...existing,
       lines: finalLines,
       discount: finalDiscount,
+      priceAdjustments: finalPriceAdjustments,
+      customItems: finalCustomItems,
       status: 'sent',
       sentAt,
       lastSentAt: sentAt,
