@@ -4,6 +4,7 @@ import { redis } from '@/lib/redis'
 
 type ProposalLines = Record<string, string[]>
 type PriceAdjustments = Record<string, number>
+type ScopeAdjustments = Record<string, string>
 type CustomItem = { id: string; label: string; description?: string; price: number; type: 'mensual' | 'proyecto' }
 
 const SERVICES = {
@@ -94,14 +95,19 @@ function getLineId(serviceKey: string, planKey: string) {
   return `${serviceKey}:${planKey}`
 }
 
-function getLineItems(lines: ProposalLines, priceAdjustments: PriceAdjustments = {}, customItems: CustomItem[] = []) {
+function getLineItems(
+  lines: ProposalLines,
+  priceAdjustments: PriceAdjustments = {},
+  customItems: CustomItem[] = [],
+  scopeAdjustments: ScopeAdjustments = {}
+) {
   const items: Array<{ id: string; service: string; plan: string; desc: string; price: number; type: string }> = []
 
   for (const [serviceKey, planKeys] of Object.entries(lines || {})) {
     if (serviceKey === 'bundle') {
       const bundle = BUNDLES[planKeys[0] as keyof typeof BUNDLES]
       const id = getLineId(serviceKey, planKeys[0])
-      if (bundle) items.push({ id, service: 'Plan mensual', plan: bundle.name, desc: bundle.desc, price: priceAdjustments[id] ?? bundle.price, type: 'mensual' })
+      if (bundle) items.push({ id, service: 'Plan mensual', plan: bundle.name, desc: scopeAdjustments[id] ?? bundle.desc, price: priceAdjustments[id] ?? bundle.price, type: 'mensual' })
       continue
     }
 
@@ -112,7 +118,7 @@ function getLineItems(lines: ProposalLines, priceAdjustments: PriceAdjustments =
     for (const planKey of planKeys) {
       const plan = plans[planKey]
       const id = getLineId(serviceKey, planKey)
-      if (plan) items.push({ id, service: service.label, plan: plan.name, desc: plan.desc, price: priceAdjustments[id] ?? plan.price, type: service.type })
+      if (plan) items.push({ id, service: service.label, plan: plan.name, desc: scopeAdjustments[id] ?? plan.desc, price: priceAdjustments[id] ?? plan.price, type: service.type })
     }
   }
 
@@ -122,15 +128,15 @@ function getLineItems(lines: ProposalLines, priceAdjustments: PriceAdjustments =
       id: item.id,
       service: 'Extra personalizado',
       plan: item.label,
-      desc: item.description || 'Ajuste agregado manualmente',
+      desc: scopeAdjustments[item.id] ?? (item.description || 'Ajuste agregado manualmente'),
       price: priceAdjustments[item.id] ?? (Number(item.price) || 0),
       type: item.type,
     })),
   ]
 }
 
-function computeTotal(lines: ProposalLines, discount = 0, priceAdjustments: PriceAdjustments = {}, customItems: CustomItem[] = []) {
-  const items = getLineItems(lines, priceAdjustments, customItems)
+function computeTotal(lines: ProposalLines, discount = 0, priceAdjustments: PriceAdjustments = {}, customItems: CustomItem[] = [], scopeAdjustments: ScopeAdjustments = {}) {
+  const items = getLineItems(lines, priceAdjustments, customItems, scopeAdjustments)
   const mensual = items.filter(i => i.type === 'mensual').reduce((sum, item) => sum + item.price, 0)
   const proyecto = items.filter(i => i.type === 'proyecto').reduce((sum, item) => sum + item.price, 0)
   const total = Math.max(0, mensual + proyecto - discount)
@@ -142,9 +148,10 @@ function buildProposalEmail(
   lines: ProposalLines,
   discount = 0,
   priceAdjustments: PriceAdjustments = {},
-  customItems: CustomItem[] = []
+  customItems: CustomItem[] = [],
+  scopeAdjustments: ScopeAdjustments = {}
 ) {
-  const totals = computeTotal(lines, discount, priceAdjustments, customItems)
+  const totals = computeTotal(lines, discount, priceAdjustments, customItems, scopeAdjustments)
   const firstName = String(quote.nombre || '').split(' ')[0] || 'hola'
   const itemsHtml = totals.items.map(item => `
     <tr>
@@ -225,7 +232,7 @@ export async function GET(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
-    const { id, status, adminNote, lines, discount, priceAdjustments, customItems, client } = await request.json()
+    const { id, status, adminNote, lines, discount, priceAdjustments, scopeAdjustments, customItems, client } = await request.json()
     if (!id) return NextResponse.json({ error: 'Falta id' }, { status: 400 })
 
     const existing = await redis.get(`quote:${id}`) as Record<string, unknown> | null
@@ -244,6 +251,9 @@ export async function PATCH(request: NextRequest) {
     }
     if (priceAdjustments !== undefined && !sameJson(priceAdjustments, existing.priceAdjustments)) {
       events.push(historyEvent('prices_updated', 'Precios ajustados manualmente'))
+    }
+    if (scopeAdjustments !== undefined && !sameJson(scopeAdjustments, existing.scopeAdjustments)) {
+      events.push(historyEvent('scope_updated', 'Entregables de la propuesta actualizados'))
     }
     if (customItems !== undefined && !sameJson(customItems, existing.customItems)) {
       events.push(historyEvent('custom_items_updated', 'Extras personalizados actualizados'))
@@ -265,6 +275,7 @@ export async function PATCH(request: NextRequest) {
       ...(lines     !== undefined && { lines }),
       ...(discount  !== undefined && { discount }),
       ...(priceAdjustments !== undefined && { priceAdjustments }),
+      ...(scopeAdjustments !== undefined && { scopeAdjustments }),
       ...(customItems !== undefined && { customItems }),
       updatedAt: new Date().toISOString(),
       history: [...history, ...events],
@@ -280,7 +291,7 @@ export async function PATCH(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { action, id, lines, discount, priceAdjustments, customItems } = body
+    const { action, id, lines, discount, priceAdjustments, scopeAdjustments, customItems } = body
 
     if (action === 'create') {
       const quote = body.quote || {}
@@ -307,8 +318,9 @@ export async function POST(request: NextRequest) {
       const finalLines = (lines || {}) as ProposalLines
       const finalDiscount = Number(discount || 0)
       const finalPriceAdjustments = (priceAdjustments || {}) as PriceAdjustments
+      const finalScopeAdjustments = (scopeAdjustments || {}) as ScopeAdjustments
       const finalCustomItems = (customItems || []) as CustomItem[]
-      const totals = computeTotal(finalLines, finalDiscount, finalPriceAdjustments, finalCustomItems)
+      const totals = computeTotal(finalLines, finalDiscount, finalPriceAdjustments, finalCustomItems, finalScopeAdjustments)
       const record = {
         id: quoteId,
         ...normalized,
@@ -318,6 +330,7 @@ export async function POST(request: NextRequest) {
         lines: finalLines,
         discount: finalDiscount,
         priceAdjustments: finalPriceAdjustments,
+        scopeAdjustments: finalScopeAdjustments,
         customItems: finalCustomItems,
         estimate: { min: totals.total, max: totals.total, type: totals.mensual && totals.proyecto ? 'mixto' : totals.mensual ? 'mensual' : 'por proyecto' },
         submittedAt,
@@ -340,8 +353,9 @@ export async function POST(request: NextRequest) {
     const finalLines = (lines || existing.lines || {}) as ProposalLines
     const finalDiscount = Number(discount ?? existing.discount ?? 0)
     const finalPriceAdjustments = (priceAdjustments || existing.priceAdjustments || {}) as PriceAdjustments
+    const finalScopeAdjustments = (scopeAdjustments || existing.scopeAdjustments || {}) as ScopeAdjustments
     const finalCustomItems = (customItems || existing.customItems || []) as CustomItem[]
-    const html = buildProposalEmail(existing, finalLines, finalDiscount, finalPriceAdjustments, finalCustomItems)
+    const html = buildProposalEmail(existing, finalLines, finalDiscount, finalPriceAdjustments, finalCustomItems, finalScopeAdjustments)
 
     if (!process.env.RESEND_API_KEY) {
       return NextResponse.json({ error: 'RESEND_API_KEY no está configurada' }, { status: 500 })
@@ -363,6 +377,7 @@ export async function POST(request: NextRequest) {
       lines: finalLines,
       discount: finalDiscount,
       priceAdjustments: finalPriceAdjustments,
+      scopeAdjustments: finalScopeAdjustments,
       customItems: finalCustomItems,
       status: 'sent',
       sentAt,

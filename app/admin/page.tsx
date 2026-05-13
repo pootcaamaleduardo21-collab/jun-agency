@@ -70,6 +70,7 @@ const BUNDLES_REF = {
 
 type ServiceKey = keyof typeof SERVICES
 type PriceAdjustments = Record<string, number>
+type ScopeAdjustments = Record<string, string>
 type LineItemType = 'mensual' | 'proyecto'
 
 interface CustomItem {
@@ -112,6 +113,7 @@ interface QuoteData {
   lines?: Record<string, string[]>
   discount?: number
   priceAdjustments?: PriceAdjustments
+  scopeAdjustments?: ScopeAdjustments
   customItems?: CustomItem[]
   source?: string
   estimate?: { min: number; max: number; type: string }
@@ -174,14 +176,19 @@ function getLineId(serviceKey: string, planKey: string) {
   return `${serviceKey}:${planKey}`
 }
 
-function getProposalItems(lines: Record<string, string[]>, priceAdjustments: PriceAdjustments = {}, customItems: CustomItem[] = []) {
+function getProposalItems(
+  lines: Record<string, string[]>,
+  priceAdjustments: PriceAdjustments = {},
+  customItems: CustomItem[] = [],
+  scopeAdjustments: ScopeAdjustments = {}
+) {
   const items: Array<{ id: string; service: string; plan: string; desc: string; price: number; basePrice: number; type: LineItemType }> = []
 
   for (const [svcKey, planKeys] of Object.entries(lines)) {
     if (svcKey === 'bundle') {
       const b = BUNDLES_REF[planKeys[0] as keyof typeof BUNDLES_REF]
       const id = getLineId(svcKey, planKeys[0])
-      if (b) items.push({ id, service: 'Plan mensual', plan: b.name, desc: b.desc, price: priceAdjustments[id] ?? b.price, basePrice: b.price, type: 'mensual' })
+      if (b) items.push({ id, service: 'Plan mensual', plan: b.name, desc: scopeAdjustments[id] ?? b.desc, price: priceAdjustments[id] ?? b.price, basePrice: b.price, type: 'mensual' })
       continue
     }
 
@@ -196,7 +203,7 @@ function getProposalItems(lines: Record<string, string[]>, priceAdjustments: Pri
           id,
           service: svc.label,
           plan: plan.name,
-          desc: plan.desc,
+          desc: scopeAdjustments[id] ?? plan.desc,
           price: priceAdjustments[id] ?? plan.price,
           basePrice: plan.price,
           type: svc.type,
@@ -211,7 +218,7 @@ function getProposalItems(lines: Record<string, string[]>, priceAdjustments: Pri
       id: item.id,
       service: 'Extra personalizado',
       plan: item.label,
-      desc: item.description || 'Ajuste agregado manualmente',
+      desc: scopeAdjustments[item.id] ?? (item.description || 'Ajuste agregado manualmente'),
       price: priceAdjustments[item.id] ?? (Number(item.price) || 0),
       basePrice: Number(item.price) || 0,
       type: item.type,
@@ -631,17 +638,19 @@ function CustomItemsEditor({
 }
 
 function ProposalSummary({
-  lines, priceAdjustments, setPriceAdjustments, customItems, setCustomItems, discount, setDiscount,
+  lines, priceAdjustments, setPriceAdjustments, scopeAdjustments, setScopeAdjustments, customItems, setCustomItems, discount, setDiscount,
 }: {
   lines: Record<string, string[]>
   priceAdjustments: PriceAdjustments
   setPriceAdjustments: (v: PriceAdjustments) => void
+  scopeAdjustments: ScopeAdjustments
+  setScopeAdjustments: (v: ScopeAdjustments) => void
   customItems: CustomItem[]
   setCustomItems: (v: CustomItem[]) => void
   discount: number
   setDiscount: (v: number) => void
 }) {
-  const items = getProposalItems(lines, priceAdjustments, customItems)
+  const items = getProposalItems(lines, priceAdjustments, customItems, scopeAdjustments)
   const { mensual, proyecto, total } = computeTotal(lines, priceAdjustments, customItems)
   const discounted = Math.max(0, total - discount)
 
@@ -649,30 +658,44 @@ function ProposalSummary({
     setPriceAdjustments({ ...priceAdjustments, [id]: value })
   }
 
+  const setScope = (id: string, value: string) => {
+    setScopeAdjustments({ ...scopeAdjustments, [id]: value })
+  }
+
   return (
     <div className="space-y-4">
       <div className="bg-[#111118] border border-[#2a2a3a] rounded-2xl overflow-hidden">
         <div className="px-5 py-3 border-b border-[#2a2a3a]">
-          <p className="text-white font-bold text-sm">Resumen editable</p>
-          <p className="text-white/35 text-xs mt-0.5">Puedes ajustar el precio final de cada partida.</p>
+          <p className="text-white font-bold text-sm">Preview editable</p>
+          <p className="text-white/35 text-xs mt-0.5">Ajusta precio y describe exactamente qué se entregará.</p>
         </div>
         <div className="p-5 space-y-3">
           {items.map(item => (
-            <div key={item.id} className="grid grid-cols-12 gap-2 items-start">
-              <div className="col-span-7">
-                <p className="text-white/85 text-xs font-semibold">{item.service}</p>
-                <p className="text-white/45 text-[11px]">{item.plan}</p>
-                <p className="text-white/25 text-[11px] mt-0.5">{item.type === 'mensual' ? 'Mensual' : 'Por proyecto'}</p>
+            <div key={item.id} className="rounded-xl border border-[#2a2a3a] bg-[#18181f]/70 p-3 space-y-2">
+              <div className="grid grid-cols-12 gap-2 items-start">
+                <div className="col-span-7">
+                  <p className="text-white/85 text-xs font-semibold">{item.service}</p>
+                  <p className="text-white/45 text-[11px]">{item.plan}</p>
+                  <p className="text-white/25 text-[11px] mt-0.5">{item.type === 'mensual' ? 'Mensual' : 'Por proyecto'}</p>
+                </div>
+                <div className="col-span-5 flex items-center gap-1">
+                  <span className="text-white/25 text-xs">$</span>
+                  <input
+                    type="number"
+                    value={item.price || ''}
+                    onChange={e => setPrice(item.id, Number(e.target.value) || 0)}
+                    className="w-full px-2 py-1 rounded-lg bg-[#0d0d12] border border-[#2a2a3a] text-white text-xs text-right focus:outline-none focus:border-violet-500"
+                  />
+                </div>
               </div>
-              <div className="col-span-5 flex items-center gap-1">
-                <span className="text-white/25 text-xs">$</span>
-                <input
-                  type="number"
-                  value={item.price || ''}
-                  onChange={e => setPrice(item.id, Number(e.target.value) || 0)}
-                  className="w-full px-2 py-1 rounded-lg bg-[#18181f] border border-[#2a2a3a] text-white text-xs text-right focus:outline-none focus:border-violet-500"
-                />
-              </div>
+              <label className="block text-white/30 text-[10px] uppercase tracking-wide">Qué incluye / entregables</label>
+              <textarea
+                value={item.desc}
+                onChange={e => setScope(item.id, e.target.value)}
+                rows={3}
+                placeholder="Ej. Fotografía y video profesional, 4 reels editados y videos para pauta."
+                className="w-full px-3 py-2 rounded-lg bg-[#0d0d12] border border-[#2a2a3a] text-white/80 placeholder-white/20 text-xs leading-relaxed focus:outline-none focus:border-violet-500 resize-none"
+              />
             </div>
           ))}
 
@@ -729,15 +752,16 @@ function ProposalSummary({
 }
 
 function PrintableProposal({
-  quote, lines, priceAdjustments, customItems, discount,
+  quote, lines, priceAdjustments, scopeAdjustments, customItems, discount,
 }: {
   quote: QuoteData
   lines: Record<string, string[]>
   priceAdjustments: PriceAdjustments
+  scopeAdjustments: ScopeAdjustments
   customItems: CustomItem[]
   discount: number
 }) {
-  const items = getProposalItems(lines, priceAdjustments, customItems)
+  const items = getProposalItems(lines, priceAdjustments, customItems, scopeAdjustments)
   const { mensual, proyecto, total } = computeTotal(lines, priceAdjustments, customItems)
   const finalTotal = Math.max(0, total - discount)
 
@@ -818,6 +842,7 @@ function ManualQuoteCreator({ onCreated, onCancel }: {
   const [client, setClient] = useState<ManualQuoteFormState>(EMPTY_MANUAL_FORM)
   const [lines, setLines] = useState<Record<string, string[]>>({})
   const [priceAdjustments, setPriceAdjustments] = useState<PriceAdjustments>({})
+  const [scopeAdjustments, setScopeAdjustments] = useState<ScopeAdjustments>({})
   const [customItems, setCustomItems] = useState<CustomItem[]>([])
   const [discount, setDiscount] = useState(0)
   const [saving, setSaving] = useState(false)
@@ -838,7 +863,7 @@ function ManualQuoteCreator({ onCreated, onCancel }: {
       const res = await fetch('/api/quotes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'create', quote: client, lines, priceAdjustments, customItems, discount }),
+        body: JSON.stringify({ action: 'create', quote: client, lines, priceAdjustments, scopeAdjustments, customItems, discount }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data?.error || 'No se pudo crear la cotización')
@@ -933,6 +958,8 @@ function ManualQuoteCreator({ onCreated, onCancel }: {
               lines={lines}
               priceAdjustments={priceAdjustments}
               setPriceAdjustments={setPriceAdjustments}
+              scopeAdjustments={scopeAdjustments}
+              setScopeAdjustments={setScopeAdjustments}
               customItems={customItems}
               setCustomItems={setCustomItems}
               discount={discount}
@@ -969,6 +996,7 @@ function AdminInner() {
   // Proposal state
   const [lines, setLines]           = useState<Record<string, string[]>>({})
   const [priceAdjustments, setPriceAdjustments] = useState<PriceAdjustments>({})
+  const [scopeAdjustments, setScopeAdjustments] = useState<ScopeAdjustments>({})
   const [customItems, setCustomItems] = useState<CustomItem[]>([])
   const [adminNote, setAdminNote]   = useState('')
   const [status, setStatus]         = useState('pending')
@@ -1002,6 +1030,7 @@ function AdminInner() {
           setAdminNote(data.adminNote || '')
           setDiscount(data.discount || 0)
           setPriceAdjustments(data.priceAdjustments || {})
+          setScopeAdjustments(data.scopeAdjustments || {})
           setCustomItems(data.customItems || [])
           setLines(data.lines ? data.lines : getInitialLines(data))
         })
@@ -1011,6 +1040,7 @@ function AdminInner() {
         const data = JSON.parse(atob(decodeURIComponent(q))) as QuoteData
         setQuote(data)
         setPriceAdjustments(data.priceAdjustments || {})
+        setScopeAdjustments(data.scopeAdjustments || {})
         setCustomItems(data.customItems || [])
         setLines(getInitialLines(data))
       } catch {
@@ -1020,6 +1050,7 @@ function AdminInner() {
       setQuote(null)
       setLines({})
       setPriceAdjustments({})
+      setScopeAdjustments({})
       setCustomItems([])
       setAdminNote('')
       setDiscount(0)
@@ -1048,10 +1079,10 @@ function AdminInner() {
   // Auto-save lines, notes, discount on change (debounced)
   useEffect(() => {
     if (!quote) return
-    const t = setTimeout(() => saveToDb({ lines, adminNote, discount, priceAdjustments, customItems }), 1000)
+    const t = setTimeout(() => saveToDb({ lines, adminNote, discount, priceAdjustments, scopeAdjustments, customItems }), 1000)
     return () => clearTimeout(t)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lines, adminNote, discount, priceAdjustments, customItems])
+  }, [lines, adminNote, discount, priceAdjustments, scopeAdjustments, customItems])
 
   const handlePin = () => {
     const correct = (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_ADMIN_PIN) || 'jun2026'
@@ -1092,7 +1123,7 @@ function AdminInner() {
       const res = await fetch('/api/quotes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: quote.id, lines, discount, priceAdjustments, customItems }),
+        body: JSON.stringify({ id: quote.id, lines, discount, priceAdjustments, scopeAdjustments, customItems }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data?.error || 'No se pudo enviar')
@@ -1101,6 +1132,7 @@ function AdminInner() {
         setStatus(data.quote.status || 'sent')
         setLines(data.quote.lines || lines)
         setPriceAdjustments(data.quote.priceAdjustments || priceAdjustments)
+        setScopeAdjustments(data.quote.scopeAdjustments || scopeAdjustments)
         setCustomItems(data.quote.customItems || customItems)
         setDiscount(data.quote.discount || 0)
       } else {
@@ -1310,6 +1342,8 @@ function AdminInner() {
                     lines={lines}
                     priceAdjustments={priceAdjustments}
                     setPriceAdjustments={setPriceAdjustments}
+                    scopeAdjustments={scopeAdjustments}
+                    setScopeAdjustments={setScopeAdjustments}
                     customItems={customItems}
                     setCustomItems={setCustomItems}
                     discount={discount}
@@ -1355,6 +1389,7 @@ function AdminInner() {
               quote={quote}
               lines={lines}
               priceAdjustments={priceAdjustments}
+              scopeAdjustments={scopeAdjustments}
               customItems={customItems}
               discount={discount}
             />
