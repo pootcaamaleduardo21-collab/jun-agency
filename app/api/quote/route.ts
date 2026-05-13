@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { redis } from '@/lib/redis'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 /* ─── Bundle pricing (monthly packs) ────────────────────────────────── */
 const BUNDLE_CATALOG: Record<string, { name: string; price: number }> = {
   esencial: { name: 'Plan Esencial (4 posts + 2 reels/mes — sin levantamiento)',  price: 2500 },
@@ -324,7 +322,20 @@ export async function POST(request: NextRequest) {
     // Save to Redis
     try {
       const encoded = encodeURIComponent(Buffer.from(JSON.stringify(body)).toString('base64'))
-      const record = { id: quoteId, ...body, status: 'pending', adminNote: '', lines: null, discount: 0, estimate, submittedAt: new Date().toISOString(), q: encoded }
+      const submittedAt = new Date().toISOString()
+      const record = {
+        id: quoteId,
+        ...body,
+        status: 'pending',
+        adminNote: '',
+        lines: null,
+        discount: 0,
+        estimate,
+        submittedAt,
+        updatedAt: submittedAt,
+        history: [{ at: submittedAt, action: 'created', label: 'Solicitud recibida desde el cotizador' }],
+        q: encoded,
+      }
       await redis.set(`quote:${quoteId}`, record)
       await redis.zadd('quotes:list', { score: Date.now(), member: quoteId })
     } catch (redisError) {
@@ -333,6 +344,10 @@ export async function POST(request: NextRequest) {
 
     // Try to send emails — non-blocking: form succeeds even if Resend is not configured
     try {
+      if (!process.env.RESEND_API_KEY) {
+        throw new Error('RESEND_API_KEY no configurada')
+      }
+      const resend = new Resend(process.env.RESEND_API_KEY)
       await resend.emails.send({
         from:     'JUN <noreply@junmkt.com>',
         to:       'informesjunmkt@gmail.com',

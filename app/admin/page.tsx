@@ -93,6 +93,17 @@ interface QuoteData {
   discount?: number
   estimate?: { min: number; max: number; type: string }
   submittedAt?: string
+  updatedAt?: string
+  sentAt?: string
+  lastSentAt?: string
+  history?: HistoryEvent[]
+}
+
+interface HistoryEvent {
+  at: string
+  action: string
+  label: string
+  details?: Record<string, unknown>
 }
 
 const CLIENT_TYPE_LABELS: Record<string, string> = {
@@ -149,6 +160,14 @@ function computeTotal(lines: Record<string, string[]>) {
 
 function fmt(n: number) {
   return '$' + n.toLocaleString('es-MX') + ' MXN'
+}
+
+function formatDateTime(iso?: string) {
+  if (!iso) return ''
+  return new Intl.DateTimeFormat('es-MX', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(new Date(iso))
 }
 
 /* ─── PIN Screen ─────────────────────────────────────────────────────── */
@@ -472,6 +491,8 @@ function AdminInner() {
   const [discount, setDiscount]     = useState(0)
   const [showPricing, setShowPricing] = useState(false)
   const [copied, setCopied]         = useState(false)
+  const [sending, setSending]       = useState(false)
+  const [sendMessage, setSendMessage] = useState('')
 
   // Check session auth on mount
   useEffect(() => {
@@ -516,7 +537,9 @@ function AdminInner() {
     if (!id) return
     setSaving(true)
     try {
-      await fetch('/api/quotes', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, ...patch }) })
+      const res = await fetch('/api/quotes', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, ...patch }) })
+      const data = await res.json()
+      if (data?.quote) setQuote(data.quote)
     } finally {
       setSaving(false)
     }
@@ -552,7 +575,7 @@ function AdminInner() {
 
   const { mensual, proyecto, total } = computeTotal(lines)
   const discounted = total - discount
-  const currentStatus = STATUS_OPTIONS.find(s => s.key === status)!
+  const currentStatus = STATUS_OPTIONS.find(s => s.key === status) ?? STATUS_OPTIONS[0]
 
   const openDoc = (type: 'contrato' | 'bienvenida') => {
     const qParam = searchParams.get('q') || ''
@@ -566,6 +589,34 @@ function AdminInner() {
     navigator.clipboard.writeText(waText)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  const sendProposal = async () => {
+    if (!quote?.id) return
+    setSending(true)
+    setSendMessage('')
+    try {
+      const res = await fetch('/api/quotes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: quote.id, lines, discount }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data?.error || 'No se pudo enviar')
+      if (data?.quote) {
+        setQuote(data.quote)
+        setStatus(data.quote.status || 'sent')
+        setLines(data.quote.lines || lines)
+        setDiscount(data.quote.discount || 0)
+      } else {
+        setStatus('sent')
+      }
+      setSendMessage(`Enviada a ${quote.email}`)
+    } catch (err) {
+      setSendMessage(err instanceof Error ? err.message : 'No se pudo enviar la cotización')
+    } finally {
+      setSending(false)
+    }
   }
 
   return (
@@ -668,6 +719,13 @@ function AdminInner() {
                       className="px-3 py-1.5 rounded-xl bg-[#18181f] border border-[#2a2a3a] text-white/50 text-xs font-bold hover:text-white hover:border-white/20 transition">
                       {copied ? '✓ Copiado' : 'Copiar mensaje'}
                     </button>
+                    <button
+                      onClick={sendProposal}
+                      disabled={sending || Object.keys(lines).length === 0}
+                      className="px-3 py-1.5 rounded-xl bg-lime-500/15 border border-lime-500/30 text-lime-300 text-xs font-bold hover:bg-lime-500/25 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      {sending ? 'Enviando...' : 'Enviar cotización'}
+                    </button>
                     <button onClick={() => openDoc('contrato')}
                       className="px-3 py-1.5 rounded-xl bg-violet-500/15 border border-violet-500/30 text-violet-300 text-xs font-bold hover:bg-violet-500/25 transition">
                       📄 Contrato
@@ -677,6 +735,11 @@ function AdminInner() {
                       🎉 Bienvenida
                     </button>
                   </div>
+                  {sendMessage && (
+                    <p className={`text-xs ${sendMessage.startsWith('Enviada') ? 'text-lime-300' : 'text-red-300'}`}>
+                      {sendMessage}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -832,6 +895,29 @@ function AdminInner() {
                     <span className={`text-xs font-bold px-3 py-1.5 rounded-full border ${currentStatus.color}`}>
                       {currentStatus.label}
                     </span>
+                    {quote.sentAt && (
+                      <p className="text-white/35 text-xs mt-3">Enviada: {formatDateTime(quote.sentAt)}</p>
+                    )}
+                  </div>
+
+                  {/* History card */}
+                  <div className="bg-[#111118] border border-[#2a2a3a] rounded-2xl p-4">
+                    <p className="text-white/40 text-xs uppercase tracking-wide mb-3">Historial</p>
+                    {quote.history?.length ? (
+                      <div className="space-y-3">
+                        {[...quote.history].reverse().map((event, idx) => (
+                          <div key={`${event.at}-${idx}`} className="flex gap-3">
+                            <div className="mt-1 h-2 w-2 rounded-full bg-violet-400 shrink-0" />
+                            <div>
+                              <p className="text-white/75 text-xs font-semibold">{event.label}</p>
+                              <p className="text-white/30 text-[11px] mt-0.5">{formatDateTime(event.at)}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-white/30 text-xs">Sin movimientos registrados todavía.</p>
+                    )}
                   </div>
 
                 </div>
