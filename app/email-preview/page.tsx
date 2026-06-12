@@ -7,7 +7,7 @@ export default function EmailPreview() {
   <div style="max-width:600px;margin:0 auto;padding:24px 16px;">
 
     <div style="background:linear-gradient(135deg,#1a0a3a,#0a1a2a);border:1px solid #2a2a3a;border-radius:12px;padding:24px;margin-bottom:16px;text-align:center;">
-      <p style="margin:0;font-size:28px;font-weight:900;color:#fff;letter-spacing:-1px;">jún</p>
+      <img src="https://junmkt.com/logo.png" alt="JUN" style="height:32px;width:auto;filter:invert(1) brightness(1.1);display:block;margin:0 auto 4px;" />
       <p style="margin:8px 0 0;font-size:11px;color:#8b5cf6;letter-spacing:3px;text-transform:uppercase;">Nueva solicitud de cotización</p>
     </div>
 
@@ -88,12 +88,12 @@ export default function EmailPreview() {
   <div style="max-width:520px;margin:0 auto;padding:24px 16px;">
 
     <div style="background:linear-gradient(135deg,#1a0a3a,#0a1a2a);border:1px solid #2a2a3a;border-radius:16px;padding:32px 24px;margin-bottom:20px;text-align:center;">
-      <p style="margin:0 0 8px;font-size:32px;font-weight:900;color:#fff;letter-spacing:-1px;">jún</p>
+      <img src="https://junmkt.com/logo.png" alt="JUN" style="height:36px;width:auto;filter:invert(1) brightness(1.1);display:block;margin:0 auto 8px;" />
       <p style="margin:0;font-size:12px;color:#8b5cf6;letter-spacing:3px;text-transform:uppercase;">Agencia de Marketing Digital</p>
     </div>
 
     <div style="background:#111118;border:1px solid #2a2a3a;border-radius:16px;padding:28px 24px;margin-bottom:16px;">
-      <p style="margin:0 0 16px;font-size:20px;font-weight:800;color:#fff;">Hola, Carlos 👋</p>
+      <p style="margin:0 0 16px;font-size:20px;font-weight:800;color:#fff;">Hola, Carlos</p>
       <p style="margin:0 0 14px;color:#a1a1aa;font-size:15px;line-height:1.7;">
         Recibimos tu solicitud. Estamos revisando los servicios que seleccionaste para prepararte una <strong style="color:#e4e4e7;">propuesta personalizada</strong>.
       </p>

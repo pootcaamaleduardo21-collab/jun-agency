@@ -5,7 +5,6 @@ import ProblemSection from '@/components/ProblemSection'
 import ValueProposition from '@/components/ValueProposition'
 import Services from '@/components/Services'
 import HowWeWork from '@/components/HowWeWork'
-import BrandConnection from '@/components/BrandConnection'
 import ForWho from '@/components/ForWho'
 import ClosingSection from '@/components/ClosingSection'
 import FAQ from '@/components/FAQ'
@@ -23,7 +22,6 @@ export default function Home() {
         <ValueProposition />
         <Services />
         <HowWeWork />
-        <BrandConnection />
         <ForWho />
         <ClosingSection />
         <FAQ />

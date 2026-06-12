@@ -11,63 +11,63 @@ const SERVICES = {
   cm: {
     label: 'Community Manager', type: 'mensual',
     plans: {
-      basico:   { name: 'Plan Basico',   desc: '1-2 redes + gestion basica', price: 1500 },
-      estandar: { name: 'Plan Estandar', desc: '3 redes + DMs',              price: 2500 },
-      pro:      { name: 'Plan Pro',      desc: '4+ redes + estrategia',      price: 3000 },
+      basico:   { name: 'Plan Basico',   desc: '1-2 redes + gestion basica', price: 2000 },
+      estandar: { name: 'Plan Estandar', desc: '3 redes + DMs',              price: 3500 },
+      pro:      { name: 'Plan Pro',      desc: '4+ redes + estrategia',      price: 5000 },
     },
   },
   posts: {
     label: 'Diseno de Posts', type: 'mensual',
     plans: {
-      starter:   { name: 'Starter',   desc: 'Hasta 12 disenos/mes', price: 1600 },
-      estandar:  { name: 'Estandar',  desc: '13-20 disenos/mes',    price: 2500 },
-      premium:   { name: 'Premium',   desc: '21-30 disenos/mes',    price: 3500 },
-      intensivo: { name: 'Intensivo', desc: '+30 disenos/mes',      price: 4500 },
+      starter:   { name: 'Starter',   desc: 'Hasta 12 disenos/mes', price: 2200 },
+      estandar:  { name: 'Estandar',  desc: '13-20 disenos/mes',    price: 3200 },
+      premium:   { name: 'Premium',   desc: '21-30 disenos/mes',    price: 4500 },
+      intensivo: { name: 'Intensivo', desc: '+30 disenos/mes',      price: 6000 },
     },
   },
   reels: {
     label: 'Reels y Video', type: 'mensual',
     plans: {
-      starter:   { name: 'Starter',   desc: '1-4 reels/mes',   price: 1600 },
-      estandar:  { name: 'Estandar',  desc: '5-8 reels/mes',   price: 2500 },
-      premium:   { name: 'Premium',   desc: '9-12 reels/mes',  price: 3500 },
-      intensivo: { name: 'Intensivo', desc: '+12 reels/mes',   price: 4500 },
+      starter:   { name: 'Starter',   desc: '1-4 reels/mes',   price: 2200 },
+      estandar:  { name: 'Estandar',  desc: '5-8 reels/mes',   price: 3200 },
+      premium:   { name: 'Premium',   desc: '9-12 reels/mes',  price: 4500 },
+      intensivo: { name: 'Intensivo', desc: '+12 reels/mes',   price: 6000 },
     },
   },
   ads: {
     label: 'Publicidad Digital', type: 'mensual',
     plans: {
-      meta:   { name: 'Meta Ads',   desc: 'Facebook + Instagram, pauta aparte', price: 1500 },
-      google: { name: 'Google Ads', desc: 'Busqueda + Display, pauta aparte',   price: 1500 },
-      tiktok: { name: 'TikTok Ads', desc: 'Video ads, pauta aparte',            price: 1200 },
+      meta:   { name: 'Meta Ads',   desc: 'Facebook + Instagram, pauta aparte', price: 2000 },
+      google: { name: 'Google Ads', desc: 'Busqueda + Display, pauta aparte',   price: 2000 },
+      tiktok: { name: 'TikTok Ads', desc: 'Video ads, pauta aparte',            price: 1500 },
     },
   },
   produccion: {
     label: 'Foto y Video Profesional', type: 'proyecto',
     plans: {
-      foto:  { name: 'Fotografia',    desc: 'Sesion completa + edicion', price: 3500 },
-      video: { name: 'Video / Reel',  desc: 'Produccion + edicion',      price: 4500 },
-      pack:  { name: 'Pack completo', desc: 'Foto + video',              price: 7500 },
+      foto:  { name: 'Fotografia',    desc: 'Sesion completa + edicion', price: 4500 },
+      video: { name: 'Video / Reel',  desc: 'Produccion + edicion',      price: 5500 },
+      pack:  { name: 'Pack completo', desc: 'Foto + video',              price: 9000 },
     },
   },
   drone: {
     label: 'Tomas con Drone', type: 'proyecto',
     plans: {
-      standard: { name: 'Vuelo estandar', desc: 'Foto aerea + video 4K', price: 4000 },
+      standard: { name: 'Vuelo estandar', desc: 'Foto aerea + video 4K', price: 5000 },
     },
   },
   tour360: {
     label: 'Recorrido Virtual 360', type: 'proyecto',
     plans: {
-      completo: { name: 'Tour completo', desc: 'Link navegable web + movil', price: 5500 },
+      completo: { name: 'Tour completo', desc: 'Link navegable web + movil', price: 6500 },
     },
   },
 } as const
 
 const BUNDLES = {
-  esencial: { name: 'Plan Esencial', desc: '4 posts + 2 reels/mes', price: 2500 },
-  activo:   { name: 'Plan Activo',   desc: 'CM Basico + 8 posts + 5 reels/mes', price: 4500 },
-  pro:      { name: 'Plan Pro',      desc: 'CM Estandar + 12 posts + 6 reels/mes', price: 6000 },
+  esencial: { name: 'Plan Esencial', desc: '4 posts + 4 reels/mes (sin levantamiento)',                                          price: 4800  },
+  activo:   { name: 'Plan Gestión',  desc: 'CM (2 redes) + 8 posts + 5 reels/mes + levantamiento mensual',                      price: 7500  },
+  pro:      { name: 'Plan Premium',  desc: 'CM (3 redes + DMs) + 12 posts + 6 reels + levantamiento + estrategia + métricas',   price: 11000 },
 } as const
 
 function fmt(n: number) {
@@ -169,7 +169,7 @@ function buildProposalEmail(
 <body style="margin:0;padding:0;background:#f4f4f5;font-family:Arial,sans-serif;">
   <div style="max-width:640px;margin:0 auto;padding:24px 16px;">
     <div style="background:#09090b;border-radius:18px;padding:28px 24px;text-align:center;">
-      <p style="margin:0;font-size:34px;font-weight:900;color:#fff;letter-spacing:-1px;">jun</p>
+      <img src="https://junmkt.com/logo.png" alt="JUN" style="height:36px;width:auto;filter:invert(1) brightness(1.1);display:block;margin:0 auto 4px;" />
       <p style="margin:8px 0 0;color:#a78bfa;font-size:12px;letter-spacing:3px;text-transform:uppercase;">Propuesta personalizada</p>
     </div>
 

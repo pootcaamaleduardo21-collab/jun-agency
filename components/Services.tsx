@@ -110,6 +110,18 @@ export default function Services() {
           ))}
         </div>
 
+        {/* Pricing anchor */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-4 mb-10">
+          <div className="flex items-center gap-3 px-5 py-3 rounded-2xl border border-violet-500/25 bg-violet-500/5">
+            <span className="text-white/50 text-sm">Planes mensuales</span>
+            <span className="text-white font-black text-lg">desde $4,800 MXN</span>
+          </div>
+          <div className="flex items-center gap-3 px-5 py-3 rounded-2xl border border-cyan-500/25 bg-cyan-500/5">
+            <span className="text-white/50 text-sm">Producción por proyecto</span>
+            <span className="text-white font-black text-lg">desde $4,500 MXN</span>
+          </div>
+        </div>
+
         <div className="text-center">
           <Link href="/cotizar" className="cta-secondary">
             Conoce qué necesita tu proyecto

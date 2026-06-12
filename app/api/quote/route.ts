@@ -4,9 +4,9 @@ import { redis } from '@/lib/redis'
 
 /* ─── Bundle pricing (monthly packs) ────────────────────────────────── */
 const BUNDLE_CATALOG: Record<string, { name: string; price: number }> = {
-  esencial: { name: 'Plan Esencial (4 posts + 2 reels/mes — sin levantamiento)',  price: 2500 },
-  activo:   { name: 'Plan Activo (CM Básico + 8 posts + 5 reels/mes)',            price: 4500 },
-  pro:      { name: 'Plan Pro (CM Estándar + 12 posts + 6 reels/mes)',            price: 6000 },
+  esencial: { name: 'Plan Esencial (4 posts + 4 reels/mes — sin levantamiento)',                        price: 4800  },
+  activo:   { name: 'Plan Gestión (CM 2 redes + 8 posts + 5 reels/mes + levantamiento mensual)',        price: 7500  },
+  pro:      { name: 'Plan Premium (CM 3 redes + DMs + 12 posts + 6 reels + levantamiento + métricas)', price: 11000 },
 }
 
 /* ─── Internal pricing table — NEVER sent to client ─────────────────── */
@@ -28,20 +28,20 @@ function calcEstimate(data: Record<string, unknown>) {
     if (services.includes('produccion')) {
       hasProject = true
       const plans: Record<string, { name: string; price: number }> = {
-        foto:  { name: 'Fotografía profesional',     price: 3500 },
-        video: { name: 'Video / Reel profesional',   price: 4500 },
-        pack:  { name: 'Pack completo foto + video', price: 7500 },
+        foto:  { name: 'Fotografía profesional',     price: 4500 },
+        video: { name: 'Video / Reel profesional',   price: 5500 },
+        pack:  { name: 'Pack completo foto + video', price: 9000 },
       }
       const plan = plans[data.produccionPlan as string]
       if (plan) { total += plan.price; breakdown.push({ item: `${plan.name} (por proyecto)`, precio: `$${plan.price.toLocaleString('es-MX')}` }) }
     }
     if (services.includes('drone')) {
-      hasProject = true; total += 4000
-      breakdown.push({ item: 'Vuelo con drone — foto y video (por proyecto)', precio: '$4,000' })
+      hasProject = true; total += 5000
+      breakdown.push({ item: 'Vuelo con drone — foto y video (por proyecto)', precio: '$5,000' })
     }
     if (services.includes('tour360')) {
-      hasProject = true; total += 5500
-      breakdown.push({ item: 'Recorrido virtual 360° (por proyecto)', precio: '$5,500' })
+      hasProject = true; total += 6500
+      breakdown.push({ item: 'Recorrido virtual 360° (por proyecto)', precio: '$6,500' })
     }
     const min = total; const max = Math.round(total * 1.15)
     const type = hasProject ? 'mixto' : 'mensual'
@@ -52,9 +52,9 @@ function calcEstimate(data: Record<string, unknown>) {
   if (services.includes('cm')) {
     hasMonthly = true
     const plans: Record<string, { name: string; price: number }> = {
-      basico:   { name: 'Plan Básico (1–2 redes)',          price: 1500 },
-      estandar: { name: 'Plan Estándar (3 redes + DMs)',    price: 2500 },
-      pro:      { name: 'Plan Pro (4+ redes + DMs)',        price: 3000 },
+      basico:   { name: 'Plan Básico (1–2 redes)',          price: 2000 },
+      estandar: { name: 'Plan Estándar (3 redes + DMs)',    price: 3500 },
+      pro:      { name: 'Plan Pro (4+ redes + DMs)',        price: 5000 },
     }
     const plan = plans[data.cmPlan as string]
     if (plan) {
@@ -67,10 +67,10 @@ function calcEstimate(data: Record<string, unknown>) {
   if (services.includes('posts')) {
     hasMonthly = true
     const plans: Record<string, { name: string; price: number }> = {
-      starter:  { name: 'Starter (hasta 12/mes)',  price: 1600 },
-      estandar: { name: 'Estándar (13–20/mes)',    price: 2500 },
-      premium:  { name: 'Premium (21–30/mes)',     price: 3500 },
-      intensivo:{ name: 'Intensivo (+30/mes)',     price: 4500 },
+      starter:  { name: 'Starter (hasta 12/mes)',  price: 2200 },
+      estandar: { name: 'Estándar (13–20/mes)',    price: 3200 },
+      premium:  { name: 'Premium (21–30/mes)',     price: 4500 },
+      intensivo:{ name: 'Intensivo (+30/mes)',     price: 6000 },
     }
     const plan = plans[data.postsPlan as string]
     if (plan) {
@@ -83,10 +83,10 @@ function calcEstimate(data: Record<string, unknown>) {
   if (services.includes('reels')) {
     hasMonthly = true
     const plans: Record<string, { name: string; price: number }> = {
-      starter:  { name: 'Starter (1–4/mes)',   price: 1600 },
-      estandar: { name: 'Estándar (5–8/mes)',  price: 2500 },
-      premium:  { name: 'Premium (9–12/mes)',  price: 3500 },
-      intensivo:{ name: 'Intensivo (+12/mes)', price: 4500 },
+      starter:  { name: 'Starter (1–4/mes)',   price: 2200 },
+      estandar: { name: 'Estándar (5–8/mes)',  price: 3200 },
+      premium:  { name: 'Premium (9–12/mes)',  price: 4500 },
+      intensivo:{ name: 'Intensivo (+12/mes)', price: 6000 },
     }
     const plan = plans[data.reelsPlan as string]
     if (plan) {
@@ -99,7 +99,7 @@ function calcEstimate(data: Record<string, unknown>) {
   if (services.includes('ads')) {
     hasMonthly = true
     const platforms = (data.adsPlatforms as string[]) || []
-    const priceMap: Record<string, number> = { meta: 1500, google: 1500, tiktok: 1200 }
+    const priceMap: Record<string, number> = { meta: 2000, google: 2000, tiktok: 1500 }
     const nameMap:  Record<string, string>  = { meta: 'Meta Ads', google: 'Google Ads', tiktok: 'TikTok Ads' }
     platforms.forEach(p => {
       const price = priceMap[p] || 0
@@ -112,9 +112,9 @@ function calcEstimate(data: Record<string, unknown>) {
   if (services.includes('produccion')) {
     hasProject = true
     const plans: Record<string, { name: string; price: number }> = {
-      foto:  { name: 'Fotografía profesional',       price: 3500 },
-      video: { name: 'Video / Reel profesional',     price: 4500 },
-      pack:  { name: 'Pack completo foto + video',   price: 7500 },
+      foto:  { name: 'Fotografía profesional',       price: 4500 },
+      video: { name: 'Video / Reel profesional',     price: 5500 },
+      pack:  { name: 'Pack completo foto + video',   price: 9000 },
     }
     const plan = plans[data.produccionPlan as string]
     if (plan) {
@@ -126,15 +126,15 @@ function calcEstimate(data: Record<string, unknown>) {
   // Drone
   if (services.includes('drone')) {
     hasProject = true
-    total += 4000
-    breakdown.push({ item: 'Vuelo con drone — foto y video (por proyecto)', precio: '$4,000' })
+    total += 5000
+    breakdown.push({ item: 'Vuelo con drone — foto y video (por proyecto)', precio: '$5,000' })
   }
 
   // Recorrido 360°
   if (services.includes('tour360')) {
     hasProject = true
-    total += 5500
-    breakdown.push({ item: 'Recorrido virtual 360° (por proyecto)', precio: '$5,500' })
+    total += 6500
+    breakdown.push({ item: 'Recorrido virtual 360° (por proyecto)', precio: '$6,500' })
   }
 
   const min  = total
@@ -186,7 +186,7 @@ function buildAdminEmail(data: Record<string, unknown>, estimate: ReturnType<typ
   <div style="max-width:600px;margin:0 auto;padding:24px 16px;">
 
     <div style="background:linear-gradient(135deg,#1a0a3a,#0a1a2a);border:1px solid #2a2a3a;border-radius:12px;padding:24px;margin-bottom:16px;text-align:center;">
-      <p style="margin:0;font-size:28px;font-weight:900;color:#fff;letter-spacing:-1px;">jún</p>
+      <img src="https://junmkt.com/logo.png" alt="JUN" style="height:36px;width:auto;filter:invert(1) brightness(1.1);display:block;margin:0 auto 4px;" />
       <p style="margin:8px 0 0;font-size:11px;color:#8b5cf6;letter-spacing:3px;text-transform:uppercase;">Nueva solicitud de cotización</p>
     </div>
 
@@ -259,36 +259,114 @@ function buildAdminEmail(data: Record<string, unknown>, estimate: ReturnType<typ
 }
 
 /* ─── Client confirmation email ──────────────────────────────────────── */
-function buildClientEmail(nombre: string): string {
+function buildClientEmail(nombre: string, data: Record<string, unknown>, estimate: ReturnType<typeof calcEstimate>): string {
+  const firstName = nombre.split(' ')[0]
+  const bundle    = data.bundle as string | undefined
+  const services  = (data.services as string[]) || []
+
+  // Bundle name display
+  const bundleNames: Record<string, string> = {
+    esencial: 'Plan Esencial',
+    activo:   'Plan Activo',
+    pro:      'Plan Pro',
+  }
+  const bundleFeatures: Record<string, string> = {
+    esencial: '4 posts + 2 reels al mes (tú provees el material)',
+    activo:   'Community Manager + 8 posts + 5 reels + levantamiento mensual',
+    pro:      'Community Manager + 12 posts + 6 reels + levantamiento + reporte de métricas',
+  }
+
+  // Build list of what the client selected
+  const rows: string[] = []
+
+  if (bundle && bundleNames[bundle]) {
+    rows.push(`
+      <tr>
+        <td style="padding:10px 12px;border-bottom:1px solid #1a1a2e;">
+          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#8b5cf6;margin-right:8px;vertical-align:middle;"></span>
+          <span style="color:#e4e4e7;font-size:13px;font-weight:700;">${bundleNames[bundle]}</span>
+          <span style="display:block;margin-left:16px;color:#71717a;font-size:11px;margin-top:2px;">${bundleFeatures[bundle] || ''}</span>
+        </td>
+        <td style="padding:10px 12px;border-bottom:1px solid #1a1a2e;text-align:right;white-space:nowrap;color:#a78bfa;font-size:13px;font-weight:700;">
+          $${BUNDLE_CATALOG[bundle].price.toLocaleString('es-MX')}/mes
+        </td>
+      </tr>`)
+  }
+
+  // Extra project services (drone, 360, produccion) shown even with bundle
+  const projectServices = bundle
+    ? services.filter(s => ['produccion', 'drone', 'tour360', 'ads'].includes(s))
+    : services
+
+  for (const svc of projectServices) {
+    const label = serviceLabels[svc] || svc
+    const breakdown = estimate.breakdown.find(b => b.item.toLowerCase().includes(label.toLowerCase().split(' ')[0].toLowerCase()))
+    rows.push(`
+      <tr>
+        <td style="padding:10px 12px;border-bottom:1px solid #1a1a2e;">
+          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#06b6d4;margin-right:8px;vertical-align:middle;"></span>
+          <span style="color:#e4e4e7;font-size:13px;">${label}</span>
+        </td>
+        <td style="padding:10px 12px;border-bottom:1px solid #1a1a2e;text-align:right;white-space:nowrap;color:#71717a;font-size:12px;">
+          ${breakdown ? breakdown.precio : '—'}
+        </td>
+      </tr>`)
+  }
+
+  const typeLabel = estimate.type === 'mensual' ? 'mensual' : estimate.type === 'mixto' ? 'mensual + proyecto' : 'por proyecto'
+
   return `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#09090b;font-family:Arial,sans-serif;">
-  <div style="max-width:520px;margin:0 auto;padding:24px 16px;">
+  <div style="max-width:560px;margin:0 auto;padding:24px 16px;">
 
-    <div style="background:linear-gradient(135deg,#1a0a3a,#0a1a2a);border:1px solid #2a2a3a;border-radius:16px;padding:32px 24px;margin-bottom:20px;text-align:center;">
-      <p style="margin:0 0 8px;font-size:32px;font-weight:900;color:#fff;letter-spacing:-1px;">jún</p>
+    <div style="background:linear-gradient(135deg,#1a0a3a,#0a1a2a);border:1px solid #2a2a3a;border-radius:16px;padding:32px 24px;margin-bottom:16px;text-align:center;">
+      <img src="https://junmkt.com/logo.png" alt="JUN" style="height:40px;width:auto;filter:invert(1) brightness(1.1);display:block;margin:0 auto 8px;" />
       <p style="margin:0;font-size:12px;color:#8b5cf6;letter-spacing:3px;text-transform:uppercase;">Agencia de Marketing Digital</p>
     </div>
 
-    <div style="background:#111118;border:1px solid #2a2a3a;border-radius:16px;padding:28px 24px;margin-bottom:16px;">
-      <p style="margin:0 0 16px;font-size:20px;font-weight:800;color:#fff;">Hola, ${nombre.split(' ')[0]} 👋</p>
-      <p style="margin:0 0 14px;color:#a1a1aa;font-size:15px;line-height:1.7;">
-        Recibimos tu solicitud. Estamos revisando los servicios que seleccionaste para prepararte una
-        <strong style="color:#e4e4e7;">propuesta personalizada en PDF</strong>.
+    <div style="background:#111118;border:1px solid #2a2a3a;border-radius:16px;padding:24px;margin-bottom:12px;">
+      <p style="margin:0 0 12px;font-size:20px;font-weight:800;color:#fff;">Hola, ${firstName} 👋</p>
+      <p style="margin:0 0 10px;color:#a1a1aa;font-size:14px;line-height:1.7;">
+        Recibimos tu solicitud. Abajo encontrarás un resumen de lo que seleccionaste.
+        Vamos a prepararte una <strong style="color:#e4e4e7;">propuesta formal en PDF</strong> con todos los detalles.
       </p>
-      <p style="margin:0 0 14px;color:#a1a1aa;font-size:15px;line-height:1.7;">
-        Te contactamos en <strong style="color:#e4e4e7;">menos de 24 horas</strong> por WhatsApp o correo para platicar los detalles.
+      <p style="margin:0;color:#a1a1aa;font-size:14px;line-height:1.7;">
+        Te contactamos en <strong style="color:#e4e4e7;">menos de 24 horas</strong> por WhatsApp o correo.
       </p>
-      <p style="margin:0;color:#a1a1aa;font-size:15px;line-height:1.7;">
-        Si tienes alguna duda antes, escríbenos directo:
+    </div>
+
+    <!-- Services summary -->
+    <div style="background:#111118;border:1px solid #2a2a3a;border-radius:16px;overflow:hidden;margin-bottom:12px;">
+      <div style="padding:14px 16px;border-bottom:1px solid #2a2a3a;">
+        <p style="margin:0;font-size:10px;color:#8b5cf6;letter-spacing:2px;text-transform:uppercase;font-weight:700;">Lo que solicitaste</p>
+      </div>
+      <table width="100%" cellpadding="0" cellspacing="0">
+        ${rows.join('')}
+        <tr style="background:#1a1a2e;">
+          <td style="padding:12px 16px;color:#a1a1aa;font-size:12px;font-weight:600;">
+            Inversión estimada (${typeLabel})
+          </td>
+          <td style="padding:12px 16px;text-align:right;">
+            <span style="font-size:16px;font-weight:900;color:#a78bfa;">
+              $${estimate.min.toLocaleString('es-MX')} – $${estimate.max.toLocaleString('es-MX')} MXN
+            </span>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div style="background:#111118;border:1px solid #1a1a2e;border-radius:12px;padding:14px 16px;margin-bottom:16px;">
+      <p style="margin:0;font-size:12px;color:#52525b;line-height:1.6;">
+        Este estimado es referencial. La propuesta formal en PDF confirmará los precios exactos, alcance y condiciones según tu proyecto específico.
       </p>
     </div>
 
     <div style="text-align:center;margin-bottom:20px;">
       <a href="https://wa.me/529851089671?text=Hola%2C%20acabo%20de%20enviar%20una%20solicitud%20de%20cotizaci%C3%B3n"
-        style="display:inline-block;padding:14px 32px;border-radius:100px;background:linear-gradient(135deg,#8b5cf6,#06b6d4);color:#fff;font-size:15px;font-weight:700;text-decoration:none;">
-        Escribirnos por WhatsApp
+        style="display:inline-block;padding:14px 32px;border-radius:100px;background:linear-gradient(135deg,#8b5cf6,#06b6d4);color:#fff;font-size:14px;font-weight:700;text-decoration:none;">
+        Escribirnos por WhatsApp →
       </a>
     </div>
 
@@ -358,8 +436,8 @@ export async function POST(request: NextRequest) {
       await resend.emails.send({
         from:     'JUN <noreply@junmkt.com>',
         to:       email as string,
-        subject:  'JUN recibió tu solicitud',
-        html:     buildClientEmail(nombre as string),
+        subject:  'JUN recibió tu solicitud — resumen de lo que pediste',
+        html:     buildClientEmail(nombre as string, body, estimate),
       })
     } catch (emailError) {
       // Resend not configured or failed — quote data is saved in logs above

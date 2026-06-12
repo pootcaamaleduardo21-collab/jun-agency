@@ -8,64 +8,64 @@ const SERVICES = {
   cm: {
     icon: '👤', label: 'Community Manager', type: 'mensual' as const,
     plans: {
-      basico:   { name: 'Plan Básico',   desc: '1–2 redes · gestión básica · comentarios',        price: 1500 },
-      estandar: { name: 'Plan Estándar', desc: '3 redes · gestión completa · DMs',                price: 2500 },
-      pro:      { name: 'Plan Pro',      desc: '4+ redes · DMs · estrategia avanzada · reportes', price: 3000 },
+      basico:   { name: 'Plan Básico',   desc: '1–2 redes · gestión básica · comentarios',        price: 2000 },
+      estandar: { name: 'Plan Estándar', desc: '3 redes · gestión completa · DMs',                price: 3500 },
+      pro:      { name: 'Plan Pro',      desc: '4+ redes · DMs · estrategia avanzada · reportes', price: 5000 },
     },
   },
   posts: {
     icon: '🎨', label: 'Diseño de Posts', type: 'mensual' as const,
     plans: {
-      starter:   { name: 'Starter',   desc: 'hasta 12 diseños/mes · presencia básica',      price: 1600 },
-      estandar:  { name: 'Estándar',  desc: '13–20 diseños/mes · marca activa',             price: 2500 },
-      premium:   { name: 'Premium',   desc: '21–30 diseños/mes · campañas y lanzamientos',  price: 3500 },
-      intensivo: { name: 'Intensivo', desc: '+30 diseños/mes · máxima producción',          price: 4500 },
+      starter:   { name: 'Starter',   desc: 'hasta 12 diseños/mes · presencia básica',      price: 2200 },
+      estandar:  { name: 'Estándar',  desc: '13–20 diseños/mes · marca activa',             price: 3200 },
+      premium:   { name: 'Premium',   desc: '21–30 diseños/mes · campañas y lanzamientos',  price: 4500 },
+      intensivo: { name: 'Intensivo', desc: '+30 diseños/mes · máxima producción',          price: 6000 },
     },
   },
   reels: {
     icon: '🎬', label: 'Reels y Video', type: 'mensual' as const,
     plans: {
-      starter:   { name: 'Starter',   desc: '1–4 reels/mes · para empezar con video',      price: 1600 },
-      estandar:  { name: 'Estándar',  desc: '5–8 reels/mes · presencia sólida en video',   price: 2500 },
-      premium:   { name: 'Premium',   desc: '9–12 reels/mes · video como motor',            price: 3500 },
-      intensivo: { name: 'Intensivo', desc: '+12 reels/mes · estrategia 100% video',       price: 4500 },
+      starter:   { name: 'Starter',   desc: '1–4 reels/mes · para empezar con video',      price: 2200 },
+      estandar:  { name: 'Estándar',  desc: '5–8 reels/mes · presencia sólida en video',   price: 3200 },
+      premium:   { name: 'Premium',   desc: '9–12 reels/mes · video como motor',            price: 4500 },
+      intensivo: { name: 'Intensivo', desc: '+12 reels/mes · estrategia 100% video',       price: 6000 },
     },
   },
   ads: {
     icon: '📣', label: 'Publicidad Digital', type: 'mensual' as const,
     plans: {
-      meta:   { name: 'Meta Ads',   desc: 'Facebook + Instagram · fee de gestión · pauta aparte', price: 1500 },
-      google: { name: 'Google Ads', desc: 'Búsqueda + Display · fee de gestión · pauta aparte',   price: 1500 },
-      tiktok: { name: 'TikTok Ads', desc: 'Video ads · fee de gestión · pauta aparte',            price: 1200 },
+      meta:   { name: 'Meta Ads',   desc: 'Facebook + Instagram · fee de gestión · pauta aparte', price: 2000 },
+      google: { name: 'Google Ads', desc: 'Búsqueda + Display · fee de gestión · pauta aparte',   price: 2000 },
+      tiktok: { name: 'TikTok Ads', desc: 'Video ads · fee de gestión · pauta aparte',            price: 1500 },
     },
   },
   produccion: {
     icon: '📷', label: 'Foto y Video Profesional', type: 'proyecto' as const,
     plans: {
-      foto:  { name: 'Fotografía',    desc: 'Sesión completa · edición · entregables HR',              price: 3500 },
-      video: { name: 'Video / Reel',  desc: 'Producción + edición · formatos multiplataforma',         price: 4500 },
-      pack:  { name: 'Pack completo', desc: 'Foto + video en una sesión · todo incluido · mejor valor', price: 7500 },
+      foto:  { name: 'Fotografía',    desc: 'Sesión completa · edición · entregables HR',               price: 4500 },
+      video: { name: 'Video / Reel',  desc: 'Producción + edición · formatos multiplataforma',          price: 5500 },
+      pack:  { name: 'Pack completo', desc: 'Foto + video en una sesión · todo incluido · mejor valor', price: 9000 },
     },
   },
   drone: {
     icon: '🚁', label: 'Tomas con Drone', type: 'proyecto' as const,
     plans: {
-      standard: { name: 'Vuelo estándar', desc: 'Foto aérea HR + video 4K · derechos de uso incluidos', price: 4000 },
+      standard: { name: 'Vuelo estándar', desc: 'Foto aérea HR + video 4K · derechos de uso incluidos', price: 5000 },
     },
   },
   tour360: {
     icon: '🔵', label: 'Recorrido Virtual 360°', type: 'proyecto' as const,
     plans: {
-      completo: { name: 'Tour completo', desc: 'Captura completa · link navegable web + móvil · compartible', price: 5500 },
+      completo: { name: 'Tour completo', desc: 'Captura completa · link navegable web + móvil · compartible', price: 6500 },
     },
   },
 } as const
 
 /* ─── Bundle catalog (for pricing reference table) ───────────────────── */
 const BUNDLES_REF = {
-  esencial: { name: 'Plan Esencial',  desc: '4 posts + 2 reels/mes · sin levantamiento de contenido',                         price: 2500 },
-  activo:   { name: 'Plan Activo',    desc: 'CM Básico + 8 posts + 5 reels/mes · con levantamiento mensual',                  price: 4500 },
-  pro:      { name: 'Plan Pro',       desc: 'CM Estándar + 12 posts + 6 reels/mes · con levantamiento + reporte de métricas', price: 6000 },
+  esencial: { name: 'Plan Esencial',  desc: '4 posts + 4 reels/mes · sin levantamiento de contenido',                                        price: 4800  },
+  activo:   { name: 'Plan Gestión',   desc: 'CM (2 redes) + 8 posts + 5 reels/mes · con levantamiento mensual',                              price: 7500  },
+  pro:      { name: 'Plan Premium',   desc: 'CM (3 redes + DMs) + 12 posts + 6 reels + levantamiento + estrategia + reporte de métricas',    price: 11000 },
 }
 
 type ServiceKey = keyof typeof SERVICES
@@ -256,7 +256,8 @@ function PINScreen({ pin, setPin, onSubmit, error }: {
     <div className="min-h-screen bg-[#09090b] flex items-center justify-center px-4">
       <div className="w-full max-w-xs">
         <div className="text-center mb-8">
-          <p className="text-white font-black text-3xl tracking-tight mb-1">jún</p>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="JUN" className="h-8 w-auto mb-1" style={{ filter: 'invert(1) brightness(1.1)' }} />
           <p className="text-white/40 text-sm">Panel interno</p>
         </div>
         <div className="bg-[#111118] border border-[#2a2a3a] rounded-2xl p-6">
@@ -769,7 +770,8 @@ function PrintableProposal({
     <div className="hidden print:block bg-white text-gray-900 min-h-screen p-10">
       <div className="flex items-start justify-between border-b border-gray-200 pb-6">
         <div>
-          <p className="text-4xl font-black tracking-tight">jún</p>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="JUN" style={{ height: '36px', width: 'auto' }} />
           <p className="text-xs uppercase tracking-[0.25em] text-violet-600 mt-1">Propuesta comercial</p>
         </div>
         <div className="text-right text-sm text-gray-500">
@@ -1153,7 +1155,10 @@ function AdminInner() {
       <div className="border-b border-white/5 px-4 py-4 print:hidden">
         <div className="max-w-5xl mx-auto flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-white font-black text-xl">jún</Link>
+            <Link href="/">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.png" alt="JUN" className="h-6 w-auto" style={{ filter: 'invert(1) brightness(1.1)' }} />
+            </Link>
             <span className="text-white/20">/</span>
             {quote ? (
               <button onClick={() => router.push('/admin')} className="text-white/50 text-sm hover:text-white transition">

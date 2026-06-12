@@ -8,9 +8,9 @@ const SERVICE_LABELS: Record<string, string> = {
   ads: 'Publicidad digital', produccion: 'Foto y video profesional',
   drone: 'Tomas con drone', tour360: 'Recorrido virtual 360°',
 }
-const SERVICE_ICONS: Record<string, string> = {
-  cm: '👤', posts: '🎨', reels: '🎬', ads: '📣',
-  produccion: '📷', drone: '🚁', tour360: '🔵',
+const SERVICE_COLORS: Record<string, string> = {
+  cm: '#8b5cf6', posts: '#06b6d4', reels: '#a855f7', ads: '#f59e0b',
+  produccion: '#10b981', drone: '#3b82f6', tour360: '#ec4899',
 }
 const BUNDLE_NAMES: Record<string, string> = {
   esencial: 'Plan Esencial', activo: 'Plan Activo', pro: 'Plan Pro',
@@ -42,11 +42,12 @@ function WelcomeDoc({ quote, lines }: { quote: QuoteData; lines: ProposalLines }
 
       {/* Hero header */}
       <div style={{ background: 'linear-gradient(135deg, #1a0a3a 0%, #0a1a2a 100%)' }} className="px-12 py-14 print:px-10 print:py-10 text-center">
-        <p style={{ letterSpacing: '-1px' }} className="text-white font-black text-4xl mb-2">jún</p>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo.png" alt="JUN" style={{ height: '40px', width: 'auto', filter: 'invert(1) brightness(1.1)', marginBottom: '8px' }} />
         <p className="text-white/40 text-xs tracking-widest uppercase">Agencia de Marketing Digital</p>
         <div className="w-12 h-px bg-white/20 mx-auto my-6" />
-        <p className="text-white font-black text-2xl mb-1">¡Bienvenido/a, {firstName}! 🎉</p>
-        <p style={{ color: 'rgba(139,92,246,0.9)' }} className="text-sm font-semibold tracking-wide">{empresa} × jún</p>
+        <p className="text-white font-black text-2xl mb-1">Bienvenido/a, {firstName}</p>
+        <p style={{ color: 'rgba(139,92,246,0.9)' }} className="text-sm font-semibold tracking-wide">{empresa} × JUN</p>
       </div>
 
       {/* Body */}
@@ -56,7 +57,7 @@ function WelcomeDoc({ quote, lines }: { quote: QuoteData; lines: ProposalLines }
         <div className="mb-10">
           <p className="text-gray-700 text-base leading-relaxed mb-4">
             Estamos muy contentos de que hayas decidido trabajar con nosotros.
-            A partir de hoy, <strong>jún es tu equipo de marketing digital</strong> —
+            A partir de hoy, <strong>JUN es tu equipo de marketing digital</strong> —
             enfocados en hacer crecer tu presencia y resultados.
           </p>
           <p className="text-gray-500 text-sm leading-relaxed">
@@ -71,7 +72,9 @@ function WelcomeDoc({ quote, lines }: { quote: QuoteData; lines: ProposalLines }
           <div className="space-y-2">
             {bundleName && (
               <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.2)' }}>
-                <span className="text-lg">📦</span>
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(139,92,246,0.15)' }}>
+                  <div className="w-2 h-2 rounded-full" style={{ background: '#8b5cf6' }} />
+                </div>
                 <div>
                   <p className="font-bold text-gray-800 text-sm">{bundleName}</p>
                   <p className="text-gray-500 text-xs">Plan mensual todo incluido</p>
@@ -82,7 +85,9 @@ function WelcomeDoc({ quote, lines }: { quote: QuoteData; lines: ProposalLines }
               .filter(s => !bundleName || ['produccion', 'drone', 'tour360', 'ads'].includes(s))
               .map(svc => (
                 <div key={svc} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100">
-                  <span className="text-lg">{SERVICE_ICONS[svc] || '✓'}</span>
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${SERVICE_COLORS[svc] || '#8b5cf6'}18` }}>
+                    <div className="w-2 h-2 rounded-full" style={{ background: SERVICE_COLORS[svc] || '#8b5cf6' }} />
+                  </div>
                   <p className="font-semibold text-gray-700 text-sm">{SERVICE_LABELS[svc] || svc}</p>
                 </div>
               ))}
@@ -114,7 +119,7 @@ function WelcomeDoc({ quote, lines }: { quote: QuoteData; lines: ProposalLines }
             <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-black text-lg shrink-0" style={{ background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)' }}>J</div>
             <div>
               <p className="font-bold text-gray-800">Jimmy Caamal</p>
-              <p className="text-gray-500 text-sm">Director · jún</p>
+              <p className="text-gray-500 text-sm">Director · JUN</p>
               <div className="flex gap-4 mt-1">
                 <a href="https://wa.me/529851089671" className="text-green-600 text-xs font-semibold">WhatsApp: +52 985 108 9671</a>
                 <a href="mailto:informesjunmkt@gmail.com" className="text-blue-600 text-xs">informesjunmkt@gmail.com</a>
@@ -127,7 +132,7 @@ function WelcomeDoc({ quote, lines }: { quote: QuoteData; lines: ProposalLines }
         <p className="text-gray-500 text-sm leading-relaxed italic border-t border-gray-100 pt-6">
           &ldquo;Nos emociona ser parte de tu crecimiento. Trabajemos juntos para hacer que tu marca destaque y conecte con las personas correctas.&rdquo;
           <br /><br />
-          <span className="font-bold text-gray-700">— Equipo jún</span>
+          <span className="font-bold text-gray-700">— Equipo JUN</span>
         </p>
 
       </div>
@@ -135,7 +140,8 @@ function WelcomeDoc({ quote, lines }: { quote: QuoteData; lines: ProposalLines }
       {/* Footer */}
       <div className="px-12 py-6 print:px-10" style={{ background: '#09090b' }}>
         <div className="flex items-center justify-between">
-          <p style={{ letterSpacing: '-0.5px' }} className="text-white font-black text-lg">jún</p>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="JUN" style={{ height: '28px', width: 'auto', filter: 'invert(1) brightness(1.1)' }} />
           <p className="text-white/30 text-xs">junmkt.com · Riviera Maya, México</p>
         </div>
       </div>
@@ -199,7 +205,7 @@ function BienvenidaInner() {
             onClick={() => window.print()}
             className="px-4 py-2 rounded-xl bg-cyan-500 text-white text-xs font-bold hover:bg-cyan-600 transition"
           >
-            🖨️ Imprimir / Guardar PDF
+            Imprimir / Guardar PDF
           </button>
         </div>
       </div>

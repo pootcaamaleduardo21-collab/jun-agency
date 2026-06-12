@@ -12,52 +12,63 @@ const SERVICE_LABELS: Record<string, string> = {
 
 const ALL_PLANS: Record<string, Record<string, { name: string; price: number; type: 'mensual' | 'proyecto' }>> = {
   cm: {
-    basico:   { name: 'Plan Básico (1–2 redes)',          price: 1500, type: 'mensual' },
-    estandar: { name: 'Plan Estándar (3 redes + DMs)',    price: 2500, type: 'mensual' },
-    pro:      { name: 'Plan Pro (4+ redes + DMs)',        price: 3000, type: 'mensual' },
+    basico:   { name: 'Plan Básico (1–2 redes)',          price: 2000, type: 'mensual' },
+    estandar: { name: 'Plan Estándar (3 redes + DMs)',    price: 3500, type: 'mensual' },
+    pro:      { name: 'Plan Pro (4+ redes + DMs)',        price: 5000, type: 'mensual' },
   },
   posts: {
-    starter:   { name: 'Starter (hasta 12/mes)',  price: 1600, type: 'mensual' },
-    estandar:  { name: 'Estándar (13–20/mes)',    price: 2500, type: 'mensual' },
-    premium:   { name: 'Premium (21–30/mes)',     price: 3500, type: 'mensual' },
-    intensivo: { name: 'Intensivo (+30/mes)',     price: 4500, type: 'mensual' },
+    starter:   { name: 'Starter (hasta 12/mes)',  price: 2200, type: 'mensual' },
+    estandar:  { name: 'Estándar (13–20/mes)',    price: 3200, type: 'mensual' },
+    premium:   { name: 'Premium (21–30/mes)',     price: 4500, type: 'mensual' },
+    intensivo: { name: 'Intensivo (+30/mes)',     price: 6000, type: 'mensual' },
   },
   reels: {
-    starter:   { name: 'Starter (1–4/mes)',   price: 1600, type: 'mensual' },
-    estandar:  { name: 'Estándar (5–8/mes)',  price: 2500, type: 'mensual' },
-    premium:   { name: 'Premium (9–12/mes)',  price: 3500, type: 'mensual' },
-    intensivo: { name: 'Intensivo (+12/mes)', price: 4500, type: 'mensual' },
+    starter:   { name: 'Starter (1–4/mes)',   price: 2200, type: 'mensual' },
+    estandar:  { name: 'Estándar (5–8/mes)',  price: 3200, type: 'mensual' },
+    premium:   { name: 'Premium (9–12/mes)',  price: 4500, type: 'mensual' },
+    intensivo: { name: 'Intensivo (+12/mes)', price: 6000, type: 'mensual' },
   },
   ads: {
-    meta:   { name: 'Meta Ads (FB + IG)',  price: 1500, type: 'mensual' },
-    google: { name: 'Google Ads',          price: 1500, type: 'mensual' },
-    tiktok: { name: 'TikTok Ads',          price: 1200, type: 'mensual' },
+    meta:   { name: 'Meta Ads (FB + IG)',  price: 2000, type: 'mensual' },
+    google: { name: 'Google Ads',          price: 2000, type: 'mensual' },
+    tiktok: { name: 'TikTok Ads',          price: 1500, type: 'mensual' },
   },
   produccion: {
-    foto:  { name: 'Fotografía profesional',     price: 3500, type: 'proyecto' },
-    video: { name: 'Video / Reel profesional',   price: 4500, type: 'proyecto' },
-    pack:  { name: 'Pack completo foto + video', price: 7500, type: 'proyecto' },
+    foto:  { name: 'Fotografía profesional',     price: 4500, type: 'proyecto' },
+    video: { name: 'Video / Reel profesional',   price: 5500, type: 'proyecto' },
+    pack:  { name: 'Pack completo foto + video', price: 9000, type: 'proyecto' },
   },
   drone: {
-    standard: { name: 'Vuelo con drone (foto + video 4K)', price: 4000, type: 'proyecto' },
+    standard: { name: 'Vuelo con drone (foto + video 4K)', price: 5000, type: 'proyecto' },
   },
   tour360: {
-    completo: { name: 'Recorrido virtual 360°', price: 5500, type: 'proyecto' },
+    completo: { name: 'Recorrido virtual 360°', price: 6500, type: 'proyecto' },
   },
 }
 
 const BUNDLES: Record<string, { name: string; price: number; desc: string }> = {
-  esencial: { name: 'Plan Esencial',  price: 2500, desc: '4 posts + 2 reels/mes (sin levantamiento de contenido)' },
-  activo:   { name: 'Plan Activo',    price: 4500, desc: 'CM Básico + 8 posts + 5 reels/mes (con levantamiento mensual)' },
-  pro:      { name: 'Plan Pro',       price: 6000, desc: 'CM Estándar + 12 posts + 6 reels/mes (con levantamiento + reporte de métricas)' },
+  esencial: { name: 'Plan Esencial',  price: 4800,  desc: '4 posts + 4 reels/mes (sin levantamiento de contenido)' },
+  activo:   { name: 'Plan Gestión',   price: 7500,  desc: 'CM (2 redes) + 8 posts + 5 reels/mes (con levantamiento mensual)' },
+  pro:      { name: 'Plan Premium',   price: 11000, desc: 'CM (3 redes + DMs) + 12 posts + 6 reels + levantamiento + estrategia + reporte de métricas' },
 }
 
 function fmt(n: number) { return '$' + n.toLocaleString('es-MX') + ' MXN' }
 function today() {
   return new Date().toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })
 }
-function contractNum() {
-  return 'JUN-' + new Date().getFullYear() + '-' + String(Math.floor(1000 + Math.random() * 9000))
+function contractNumFromId(id: string | null, q: string | null): string {
+  const year = new Date().getFullYear()
+  if (id) {
+    // UUID: take last 4 hex chars, convert to decimal 1000–9999
+    const suffix = parseInt(id.replace(/-/g, '').slice(-4), 16) % 9000 + 1000
+    return `JUN-${year}-${suffix}`
+  }
+  if (q) {
+    // Fallback: derive from first 4 chars of the encoded quote param
+    const suffix = parseInt(q.slice(0, 4).replace(/[^0-9a-f]/gi, '0').padEnd(4, '0'), 16) % 9000 + 1000
+    return `JUN-${year}-${suffix}`
+  }
+  return `JUN-${year}-0000`
 }
 
 interface QuoteData {
@@ -71,26 +82,54 @@ interface ProposalLines { [svc: string]: string[] }
 
 function buildLines(quote: QuoteData, overrideLines?: ProposalLines): Array<{ label: string; plan: string; price: number; type: 'mensual' | 'proyecto' }> {
   const result: Array<{ label: string; plan: string; price: number; type: 'mensual' | 'proyecto' }> = []
+  const hasBundleMonthly = !!(quote.bundle && BUNDLES[quote.bundle])
 
   // Bundle line
-  if (quote.bundle && BUNDLES[quote.bundle]) {
+  if (hasBundleMonthly) {
     const b = BUNDLES[quote.bundle]
     result.push({ label: b.name, plan: b.desc, price: b.price, type: 'mensual' })
   }
 
-  // Override or original lines (skip monthly services if bundle covers them)
-  const lines = overrideLines || {}
-  const hasBundleMonthly = !!(quote.bundle && BUNDLES[quote.bundle])
+  const hasOverride = overrideLines && Object.keys(overrideLines).length > 0
 
-  for (const [svc, planKeys] of Object.entries(lines)) {
-    const plans = ALL_PLANS[svc]
-    if (!plans) continue
-    for (const pk of planKeys) {
-      const plan = plans[pk]
-      if (!plan) continue
-      // If bundle covers monthly, skip cm/posts/reels from individual billing
-      if (hasBundleMonthly && plan.type === 'mensual' && !overrideLines) continue
-      result.push({ label: SERVICE_LABELS[svc] || svc, plan: plan.name, price: plan.price, type: plan.type })
+  if (hasOverride) {
+    // Admin edited the proposal lines — use them as-is
+    for (const [svc, planKeys] of Object.entries(overrideLines!)) {
+      const plans = ALL_PLANS[svc]
+      if (!plans) continue
+      for (const pk of planKeys) {
+        const plan = plans[pk]
+        if (!plan) continue
+        result.push({ label: SERVICE_LABELS[svc] || svc, plan: plan.name, price: plan.price, type: plan.type })
+      }
+    }
+  } else {
+    // No override — fall back to what the client selected in the quote form
+    const services = quote.services || []
+    const planMap: Record<string, string | string[]> = {
+      cm:         quote.cmPlan,
+      posts:      quote.postsPlan,
+      reels:      quote.reelsPlan,
+      produccion: quote.produccionPlan,
+      ads:        quote.adsPlatforms || [],
+      drone:      'standard',
+      tour360:    'completo',
+    }
+
+    for (const svc of services) {
+      // Skip monthly services already covered by a bundle
+      const plans = ALL_PLANS[svc]
+      if (!plans) continue
+
+      const keys = planMap[svc]
+      const planKeys = Array.isArray(keys) ? keys : keys ? [keys] : []
+
+      for (const pk of planKeys) {
+        const plan = plans[pk as keyof typeof plans] as { name: string; price: number; type: 'mensual' | 'proyecto' } | undefined
+        if (!plan) continue
+        if (hasBundleMonthly && plan.type === 'mensual') continue
+        result.push({ label: SERVICE_LABELS[svc] || svc, plan: plan.name, price: plan.price, type: plan.type })
+      }
     }
   }
 
@@ -110,8 +149,9 @@ function ContractDoc({ quote, lines, contractId }: { quote: QuoteData; lines: Pr
       {/* Header */}
       <div className="flex items-start justify-between mb-10 pb-6 border-b-2 border-gray-100">
         <div>
-          <p className="font-black text-3xl tracking-tight text-gray-900" style={{ letterSpacing: '-1px' }}>jún</p>
-          <p className="text-xs text-gray-400 mt-0.5">Agencia de Marketing Digital</p>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="JUN" style={{ height: '32px', width: 'auto' }} />
+          <p className="text-xs text-gray-400 mt-1">Agencia de Marketing Digital</p>
         </div>
         <div className="text-right">
           <p className="text-xs text-gray-400">CONTRATO DE SERVICIOS</p>
@@ -202,17 +242,27 @@ function ContractDoc({ quote, lines, contractId }: { quote: QuoteData; lines: Pr
         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Términos y condiciones</p>
         <div className="space-y-2 text-xs text-gray-500 leading-relaxed">
           {[
-            ['1. Duración', 'El contrato tiene vigencia mensual con renovación automática al inicio de cada periodo, salvo aviso de cancelación con 30 días de anticipación por escrito.'],
-            ['2. Forma de pago', 'Los servicios se facturan de forma anticipada al inicio de cada periodo mensual. El incumplimiento de pago dentro de los 5 días hábiles podrá suspender la prestación de servicios sin responsabilidad para JUN.'],
-            ['3. Cancelación', 'Cualquiera de las partes puede dar por terminado el contrato con aviso previo de 30 días naturales. No se realizan reembolsos por servicios del periodo en curso ya iniciado.'],
-            ['4. Entregables', 'Los entregables y cantidades se especifican en el plan contratado. Cambios en el alcance deberán acordarse por escrito antes de ejecutarse.'],
-            ['5. Derechos y propiedad', 'Todo el material producido por JUN para el cliente (diseños, videos, fotografías) será de uso exclusivo del cliente una vez liquidado el servicio correspondiente.'],
-            ['6. Revisiones', 'Cada entregable incluye hasta 2 rondas de revisión. Revisiones adicionales se cotizarán por separado.'],
-            ['7. Confidencialidad', 'Ambas partes se comprometen a mantener la confidencialidad de la información sensible del negocio durante y después de la relación contractual.'],
+            ['1. Duración y renovación', 'El contrato tiene vigencia mensual con renovación automática al inicio de cada periodo, salvo aviso de cancelación con 30 días naturales de anticipación por escrito (WhatsApp o correo electrónico con acuse de recibo).'],
+            ['2. Pago', 'Los servicios se facturan de forma anticipada al inicio de cada periodo mensual. El cliente tiene 3 días hábiles a partir de la fecha de facturación para realizar el pago. Transcurrido ese plazo sin pago, JUN podrá pausar o suspender la prestación de servicios sin responsabilidad, sin derecho a reembolso proporcional.'],
+            ['3. Cancelación y reembolsos', 'No se realizan reembolsos por el periodo en curso una vez iniciado, independientemente del avance en los entregables. La cancelación con menos de 30 días de anticipación genera un cargo equivalente al 50% del mensual contratado como penalización por cancelación anticipada.'],
+            ['4. Sesiones de levantamiento de contenido', 'Cada sesión de levantamiento incluye: 1 (una) ubicación, con una duración máxima de 3 horas continuas, dentro de la zona Riviera Maya (Playa del Carmen, Tulum, Cancún y alrededores). Ubicaciones adicionales, días adicionales o locaciones que requieran traslado mayor a 40 km se cotizarán por separado. La programación de sesiones deberá coordinarse con un mínimo de 5 días hábiles de anticipación. Las sesiones canceladas por el cliente con menos de 48 horas de anticipación se considerarán como sesión consumida del periodo.'],
+            ['5. Definición de entregables de video (reels)', 'Cada reel o video incluye: duración de 30 a 90 segundos, 1 formato (vertical 9:16 para Reels/TikTok o cuadrado 1:1 para feed), música de librería con licencia libre, subtítulos o texto básico cuando aplique, y hasta 1 ronda de correcciones de edición. No incluye: animaciones personalizadas, efectos VFX, locución profesional, actores o modelos externos, ni formatos adicionales distintos al especificado.'],
+            ['6. Definición de entregables de diseño (posts)', 'Cada diseño incluye adaptación al formato especificado (feed, historia, carrusel), uso de la identidad de marca del cliente, y hasta 2 rondas de correcciones. Correcciones que impliquen cambio de concepto o rediseño completo se cotizarán como nuevo entregable.'],
+            ['7. Revisiones y aprobaciones', 'El cliente tiene 3 días hábiles para aprobar o rechazar cada entregable desde su envío. Sin respuesta en ese plazo, el material se considerará aprobado. Cada servicio incluye máximo 2 rondas de revisión; revisiones adicionales tienen un costo de $300 MXN por entregable.'],
+            ['8. Responsabilidades del cliente', 'El cliente se compromete a: (a) proporcionar accesos, materiales, briefings e información necesaria dentro de los primeros 3 días hábiles del periodo; (b) garantizar que el material propio que entregue a JUN (fotos, videos, música) está libre de derechos de terceros; (c) designar a una persona de contacto con capacidad de aprobación. El retraso del cliente en la entrega de materiales o aprobaciones puede afectar los tiempos de entrega sin responsabilidad para JUN.'],
+            ['9. Community Manager', 'El servicio de CM cubre: publicación del contenido aprobado, respuesta a comentarios generales y mensajes directos de carácter ordinario, en las redes sociales especificadas en el plan. No incluye: gestión de crisis de reputación, atención a quejas graves, moderación de trolls o situaciones que requieran respuesta legal o institucional, ni el pago de publicidad (pauta), que corre por cuenta del cliente.'],
+            ['10. Publicidad digital (Ads)', 'El fee de gestión de campañas cubre la configuración, optimización y reporte de anuncios. El presupuesto publicitario (pauta) es independiente y corre a cargo exclusivo del cliente directamente en las plataformas (Meta, Google, TikTok). JUN no adelanta ni gestiona recursos de pauta publicitaria.'],
+            ['11. Drone y Recorrido 360°', 'Los servicios de drone y recorrido 360° están sujetos a condiciones climáticas y regulaciones de vuelo vigentes (DGAC México). En caso de cancelación por clima o restricción de vuelo, se reprogramará sin costo adicional. El cliente es responsable de gestionar permisos de acceso a la propiedad o ubicación. El servicio incluye 1 ubicación y 1 fecha de captura; ubicaciones o días adicionales se cotizarán aparte.'],
+            ['12. Derechos de propiedad intelectual', 'Todo el material producido por JUN (diseños, videos, fotografías, copies) pasa a ser propiedad del cliente una vez liquidado el servicio del periodo correspondiente. JUN conserva el derecho de usar el trabajo realizado en su portafolio y materiales promocionales, salvo indicación escrita en contrario del cliente.'],
+            ['13. Confidencialidad', 'Ambas partes se comprometen a no divulgar información confidencial del negocio de la otra parte durante y por 2 años después de concluida la relación contractual.'],
+            ['14. Limitación de responsabilidad', 'JUN no se hace responsable por resultados específicos de negocio (ventas, leads, seguidores) derivados de los servicios prestados, ya que dependen de factores externos al alcance creativo. La responsabilidad máxima de JUN ante cualquier reclamación no excederá el monto del último mes facturado.'],
           ].map(([title, text]) => (
-            <div key={title} className="flex gap-2">
-              <span className="font-bold text-gray-600 shrink-0">{title}:</span>
-              <span>{text}</span>
+            <div key={title} className="flex gap-2 pb-2 border-b border-gray-50 last:border-0">
+              <span className="font-bold text-gray-600 shrink-0 w-6">{title.split('.')[0]}.</span>
+              <div>
+                <span className="font-bold text-gray-600">{title.split('. ')[1]}: </span>
+                <span>{text}</span>
+              </div>
             </div>
           ))}
         </div>
@@ -236,7 +286,7 @@ function ContractDoc({ quote, lines, contractId }: { quote: QuoteData; lines: Pr
 
       {/* Footer */}
       <div className="mt-12 pt-6 border-t border-gray-100 text-center">
-        <p className="text-[10px] text-gray-300">jún · junmkt.com · informesjunmkt@gmail.com · +52 985 108 9671 · Riviera Maya, México</p>
+        <p className="text-[10px] text-gray-300">JUN · junmkt.com · informesjunmkt@gmail.com · +52 985 108 9671 · Riviera Maya, México</p>
       </div>
     </div>
   )
@@ -248,7 +298,7 @@ function ContratoInner() {
   const [auth, setAuth]   = useState(false)
   const [quote, setQuote] = useState<QuoteData | null>(null)
   const [lines, setLines] = useState<ProposalLines>({})
-  const [contractId]      = useState(contractNum)
+  const [contractId]      = useState(() => contractNumFromId(searchParams.get('id'), searchParams.get('q')))
 
   useEffect(() => {
     if (typeof window !== 'undefined' && sessionStorage.getItem('jun_admin') === 'ok') setAuth(true)
